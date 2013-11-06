@@ -1,37 +1,29 @@
+<!DOCTYPE html>
 <html>
     <head>
         <title>Blackjack</title>
         <meta charset="utf-8">
-        
+
         <script src="js/variables.js"></script>
         <script src="js/functions.js"></script>
         <script src="js/main.js"></script>
     </head>
     <body>
         <div align="center"><h1>Blackjack</h1></div>
-        <table cellspacing=0 cellpadding=3 width=400>
-            <tr><td colspan=2 cellspacing=0 cellpadding=5 align=center>
-                    <table class=message width='100%' cellspacing=0 cellpadding=10 bgcolor=white>
-                        <tr><td align=center><img src='img/as.bmp' width=71 height=96 border=0>&nbsp;<img src='img/js.bmp' width=71 height=96 border=0></td></tr>
-                        <tr><td align=left>You must collect 21 points without going over.</td></tr>
-                        <tr><td align=center>
-                                <input type=submit value='Start!' onclick="gotopage('start')">
 
-                                <input type=hidden name=game value=hit readonly="readonly">
-                                <input type=hidden name=start value=yes readonly="readonly">
-                            </td></tr></table>
-                </td></tr></table>
-
-        <br /><br /><br />
-
-        <table cellspacing=0 cellpadding=3 width=400>
-            <tr><td colspan=2 cellspacing=0 cellpadding=5 align=center>
-                    <div align="center"><h1>Personal Statistics</h1></div>
-            <tr><td align=left><b>Wins</b></td><td align=center><b></b></td></tr>
-            <tr><td align=left><b>Losses</b></td><td align=center><b></b></td></tr>
-            <tr><td align=left><b>Games Played</b></td><td align=center><b></b></td></tr>
-            <tr><td align=left><b>Win Percentage</b></td><td align=center><b></b></td></tr>
-            <tr><td align=left><b>+/-</b></td><td align=center><b></b></td></tr>
-        </td></tr></table>
-</body>
+        <script>
+            //clearValues();
+            if (!getStoredValue('start'))
+                document.write(show_default());
+            else
+            {
+                if (!getStoredValue('stay') && points < 21)
+                    document.write(show_game());
+                else
+                    document.write(show_gameover());
+            }
+            
+            document.write(show_stats());
+        </script>
+    </body>
 </html>
