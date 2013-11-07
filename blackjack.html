@@ -18,22 +18,16 @@
             } else { // in game
                 // stay with hand
                 if (getStoredValue('stay') == '1') {
-                    // add the current game to the stats
-                    calculate_stats();
-    
-                    // set the stats
-                    set_stats();
-                    
                     // house hand
                     document.write(show_house());
-                    
+
                     document.write(show_gameover());
                 } else {
                     // house hand
                     document.write(show_house());
 
                     // hit me, show game over or current hand
-                    if (points >= 21 || win) {
+                    if (gameover) {
                         set_stats();    
                     
                         document.write(show_gameover());

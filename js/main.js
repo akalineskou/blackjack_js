@@ -20,6 +20,10 @@ if (getStoredValue('stay') == '1') {
     card_ids = JSON.parse(getStoredValue('card_ids'));
 
     house_card_ids = JSON.parse(getStoredValue('house_card_ids'));
+
+    houseNewCard();
+    
+    gameover = 1;
 } else {
     // get old cards on hit me + add a new one
     if (getStoredValue('hitme') == "1") {
@@ -27,6 +31,8 @@ if (getStoredValue('stay') == '1') {
         card_ids[Object.size(card_ids)] = random_card();
 
         house_card_ids = JSON.parse(getStoredValue('house_card_ids'));
+
+        houseNewCard();
     } else {
         // at the start, random 2 cards
         if (getStoredValue('start') == "1")
@@ -61,19 +67,29 @@ for (i = 0; i < Object.size(card_ids); i++) {
 }
 
 /* count aces
- ** points >= 11 then add 1, else 11
- */
+ ** points >= 11 then add 1, else 11 */
 for (i = 0; i < aces; i++)
     points += (points < 11 && aces - i == 1 ? 11 : 1);
 
-// win at 21 points
-if (points == 21)
+// get house points
+housePoints = calcHouseHand();
+
+if (points == 21 && housePoints != 21) // win if at 21 and house not at 21
+    win = gameover = 1;
+else if (points > 21) // end game if over 21
+    gameover = 1;
+else if (housePoints == 21) // end game if house at 21
+    gameover = 1;
+else if (housePoints > 21) // end game and win if house hand over 21
     win = gameover = 1;
 
-// at the end of the game
-if (points >= 21 || win) {
-    gameover = 1;
+// if gameover and didnt win with a 21 at start before the house
+// calculate the win
+if (gameover && win != 1)
+    win = (points < 21 && points > housePoints ? 1 : 0);
 
+// at the end of the game
+if (gameover) {
     // add the current game to the stats
     calculate_stats();
     
@@ -128,15 +144,22 @@ function show_house() {
     '<tr><td align=center colspan=2><h1>House\'s Hand</h1></td></tr>' +
     '<tr><td align=center>';
 
-    // show house_card_ids size -1 cards, the last one is turned around
+    var locPoints = 0;
+
+    // show house_card_ids size -1 cards, the last one is turned around, unless game ends
     for (i = 0; i < Object.size(house_card_ids); i++) {
-        if ((getStoredValue('stay') == '1' || gameover) || i + 1 < Object.size(house_card_ids))
+        if ((getStoredValue('stay') == '1' || gameover) || i + 1 < Object.size(house_card_ids)) {
             html_ouput += "<img src='img/" + card_info[house_card_ids[i]]['card'] + ".bmp' border=0 />";
+
+            locPoints += card_info[house_card_ids[i]]['points'];
+        }
         else
             html_ouput += "<img src='img/back.png' border=0>";
     }
 
-    html_ouput += '</td></tr>' + table_end();
+    html_ouput +=
+    '<tr><td align=center>House points = ' + ((getStoredValue('stay') == '1' || gameover) ? housePoints : locPoints) + '</td></tr>' +
+    '</td></tr>' + table_end();
 
     return html_ouput;
 }

@@ -6,6 +6,7 @@ var total_wins = 0;
 var total_losses = 0;
 var total_games = 0;
 var points = 0;
+var housePoints = 0;
 var aces = 0;
 var win = 0;
 var gameover = 0;

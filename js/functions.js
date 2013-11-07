@@ -19,6 +19,55 @@ function table_end() {
     return '</table>';
 }
 
+function houseNewCard() {
+    var locHousePoints = calcHouseHand();
+    var tempBool = 0;
+
+    // if house hand has a small card(not ace) draw another card
+    for (i = 0; i < Object.size(house_card_ids); i++) {
+        if (card_info[house_card_ids[i]]['points'] >= 2 && card_info[house_card_ids[i]]['points'] <= 5) {
+            tempBool = 1;
+
+            break;
+        }
+    }
+
+    // if house points <10 draw another card or small card
+    if (locHousePoints < 10 || tempBool)
+        house_card_ids[Object.size(house_card_ids)] = random_card();
+
+    locHousePoints = calcHouseHand();
+
+    if (locHousePoints == 21)
+        gameover = 1;
+}
+function calcHouseHand() {
+    var locPoints = 0;
+    var locAces = 0;
+
+    for (i = 0; i < Object.size(house_card_ids); i++) {
+        // current card id
+        var hand_card_id = house_card_ids[i];
+        
+        // if same card, random another
+        while (hand_card_id in house_card_ids)
+            hand_card_id = random_card();
+
+        // add the card points
+        if (card_info[hand_card_id]['points'] == 1) // ace
+            locAces++;
+        else
+            locPoints += card_info[hand_card_id]['points'];
+    }
+
+    /* count locAces
+     ** locPoints >= 11 then add 1, else 11 */
+    for (i = 0; i < locAces; i++)
+        locPoints += (locPoints < 11 && locAces - i == 1 ? 11 : 1);
+
+    return locPoints;
+}
+
 // store/get/remove/clear local values
 function storeValue(key, value) {
     localStorage.setItem(key, value);
