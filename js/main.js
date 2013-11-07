@@ -2,12 +2,6 @@ var card_ids = new Object();
 var house_card_ids = new Object();
 var showcards = '';
 
-// clear everything
-if (getURLParameter('clear') == "1") {
-    eraseCookie('stats');
-    clearValues();
-}
-
 // clear values on new game
 if (getStoredValue('newgame') == "1")
     clearValues();
@@ -22,7 +16,7 @@ if (getStoredValue('stay') == '1') {
     house_card_ids = JSON.parse(getStoredValue('house_card_ids'));
 
     houseNewCard();
-    
+
     gameover = 1;
 } else {
     // get old cards on hit me + add a new one
@@ -63,7 +57,7 @@ for (i = 0; i < Object.size(card_ids); i++) {
     else
         points += card_info[card_id]['points'];
     
-    showcards += "<img src='img/" + card_info[card_id]['card'] + ".bmp' border=0 /> ";
+    showcards += "<img src='img/" + card_info[card_id]['card'] + ".bmp' /> ";
 }
 
 /* count aces
@@ -98,88 +92,109 @@ if (gameover) {
 }
 
 function show_default() {
-    html_ouput = table_start() +
-    '<tr><td align=center><img src="img/as.bmp" border=0>&nbsp;<img src="img/js.bmp"border=0></td></tr>' +
-    '<tr><td align=center>You must collect 21 points without going over.</td></tr>' +
-    '<tr><td align=center>' +
-    '<input type="button" value="Start!" onclick="storeValue(\'start\', 1); gotopage()">' +
-    '</td></tr>' +
-    table_end();
+    html_output =
+    '<span class="valign">' +
+    '<img src="img/as.bmp">&nbsp;<img src="img/js.bmp"><br><br>' +
+    'The aim of the game is to accumulate a higher<br />point total than the dealer, but without going over 21.<br>' +
+    '</span>';
     
-    return html_ouput;
+    // set default html output visible
+    setInnerHTML('default', html_output);
+
+    button_output = '<input type="button" value="Start Game" onclick="storeValue(\'start\', 1); refreshPage()">';
+    setInnerHTML('buttons', button_output);
 }
 function show_game() {
-    html_ouput = table_start() +
-    '<tr><td align=center>' + showcards + '</td></tr>' +
-    '<tr><td align=center>Points = ' + points + '</td></tr>' +
-    '<tr><td align=center>' +
-    '<input type="button" value="Hit me!" onclick="storeValue(\'card_ids\', JSON.stringify(card_ids)); storeValue(\'house_card_ids\', JSON.stringify(house_card_ids)); storeValue(\'hitme\', 1); gotopage()">';
+    html_output =
+    '<span class="valign"><h1 class="noPad">Your hand</h1><br>' + showcards + '<br>' +
+    '<b>Points = ' + points + '</b><br></span>';
+
+    // set player html output visible
+    setInnerHTML('player', html_output);
+
+    button_output = 
+    '<input type="button" value="Hit me" onclick="storeValue(\'card_ids\', JSON.stringify(card_ids)); ' +
+    'storeValue(\'house_card_ids\', JSON.stringify(house_card_ids)); storeValue(\'hitme\', 1); refreshPage()">';
 
     if (points > 10) {
-        html_ouput +=
-        '<input type="button" value="Stay" onclick="storeValue(\'card_ids\', JSON.stringify(card_ids)); storeValue(\'house_card_ids\', JSON.stringify(house_card_ids)); storeValue(\'stay\', 1); gotopage()">';
+        button_output +=
+        '&nbsp;<input type="button" value="&nbsp;Stay&nbsp;" onclick="storeValue(\'card_ids\', JSON.stringify(card_ids)); ' +
+        'storeValue(\'house_card_ids\', JSON.stringify(house_card_ids)); storeValue(\'stay\', 1); refreshPage()">';
     }
 
-    html_ouput +=
-    '</td></tr>' + table_end();
-    
-    return html_ouput;
+    setInnerHTML('buttons', button_output);
 }
 function show_gameover() {
     // clear values on game over
     clearValues();
     
-    html_ouput = table_start() +
-    '<tr><td align=center><h1>' + gameover_message() + '</h1></td></tr>' +
-    '<tr><td align=center>' + showcards + '</td></tr>' +
-    '<tr><td align=center>Points = ' + points + '</td></tr>' +
-    '<tr><td align=center>' +
-    '<input type="button" value="New Game!" onclick="storeValue(\'newgame\', 1); gotopage()">' +
-    '</td></tr>' + table_end();
+    html_output =
+    '<span class="valign"><h1 class="noPad">Your hand</h1><br>' +
+    showcards + '<br>' +
+    '<b>Points = ' + points + '</b></span>';
     
-    return html_ouput;
+    // set player html output visible
+    setInnerHTML('player', html_output);
+
+    button_output = '<input type="button" value="Main Menu" onclick="storeValue(\'newgame\', 1); refreshPage()">';
+    setInnerHTML('buttons', button_output);
+
+    // set title visible
+    div = document.getElementById('message');
+    div.style.background = (win ? "green" : "#CD0000");
+    div.style.color = "white";
+    div.style.display = 'block';
+    div.innerHTML = '<h1 class="noPad">' + gameover_message() + '</h1>';
+
+    // set height of section
+    setSectionHeight(315);
 }
 function show_house() {
-    html_ouput = table_start() +
-    '<tr><td align=center colspan=2><h1>House\'s Hand</h1></td></tr>' +
-    '<tr><td align=center>';
+    html_output = '<span class="valign"><h1 class="noPad">Dealer\'s Hand</h1><br>';
 
     var locPoints = 0;
 
     // show house_card_ids size -1 cards, the last one is turned around, unless game ends
     for (i = 0; i < Object.size(house_card_ids); i++) {
         if ((getStoredValue('stay') == '1' || gameover) || i + 1 < Object.size(house_card_ids)) {
-            html_ouput += "<img src='img/" + card_info[house_card_ids[i]]['card'] + ".bmp' border=0 />";
+            html_output += "<img src='img/" + card_info[house_card_ids[i]]['card'] + ".bmp' />";
 
             locPoints += card_info[house_card_ids[i]]['points'];
         }
         else
-            html_ouput += "<img src='img/back.png' border=0>";
+            html_output += "<img src='img/back.png'>";
     }
 
-    html_ouput +=
-    '<tr><td align=center>House points = ' + ((getStoredValue('stay') == '1' || gameover) ? housePoints : locPoints) + '</td></tr>' +
-    '</td></tr>' + table_end();
+    html_output +=
+    '<br><b>Points = ' + ((getStoredValue('stay') == '1' || gameover) ? housePoints : locPoints) +
+    '</b></span>';
 
-    return html_ouput;
+    // set house html output visible
+    setInnerHTML('house', html_output);
 }
 
 function show_stats() {
-    html_output = table_start() +
-    '<tr><td align=center colspan=2><h1>Personal Statistics</h1></td></tr>' +
+    html_output = '<span class="valign"><h1>Statistics</h1><table>' +
+    '<tr><td align=left>Wins</td><td align=center><b>' + total_wins + '</b></td></tr>' +
+    '<tr><td align=left>Losses</td><td align=center><b>' + total_losses + '</b></td></tr>' +
+    '<tr><td align=left>Games Played</td><td align=center><b>' + (total_wins + total_losses) + '</b></td></tr>' +
+    '<tr><td align=left>Win Percentage</td><td align=center><b>' +
+    (total_losses == 0 ? (total_wins == 0 ? "---" : "100%") :
+                         (total_wins == 0 ? "0" : (total_wins/(total_wins + total_losses))*100)+'%') +
+    '</b></td></tr></table></span>';
 
-    '<tr><td align=left><b>Wins</b></td><td align=center><b>' + total_wins + '</b></td></tr>' +
-    '<tr><td align=left><b>Losses</b></td><td align=center><b>' + total_losses + '</b></td></tr>' +
-    '<tr><td align=left><b>Games Played</b></td><td align=center><b>' + (total_wins + total_losses) + '</b></td></tr>' +
-    '<tr><td align=left><b>Win Percentage</b></td><td align=center><b>' +
-    (total_losses == 0 ? (total_wins == 0 ? "---" : "100%") : (total_wins == 0 ? "0" : (total_wins/(total_wins + total_losses))*100)+'%') +
-    '</b></td></tr>' + table_end();
+    html_output = '<span class="valign"><h1>Statistics</h1><pre>' +
+    'Wins                   <b>' + total_wins + '</b><br>' +
+    'Losses                 <b>' + total_losses + '</b><br>' +
+    'Games Played           <b>' + (total_wins + total_losses) + '</b><br>' +
+    '</pre></span>';
 
-    return html_output;
+    // set stats html output visible
+    setInnerHTML('stats', html_output);
 }
 
 function gameover_message() {
-    return (!win ? "You Lose!" : "You Win!");
+    return (!win ? "You Lose" : "You Win");
 }
 
 // set/get/calc stats

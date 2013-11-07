@@ -3,43 +3,52 @@
     <head>
         <title>Blackjack</title>
         <meta charset="utf-8">
+        <link rel="stylesheet" type="text/css" href="style.css">
 
         <script src="js/variables.js"></script>
         <script src="js/functions.js"></script>
         <script src="js/main.js"></script>
     </head>
     <body>
-        <div align="center"><h1>Blackjack(<a href="" onclick="delete_cookie('stats'); clearValues(); gotopage();">Reset</a>)</h1></div>
+        <br><br><br><br>
+        <div id="title"><h1 class="noPad">Blackjack<font class="small">(<a href="" title="Clear everything + statistics" onclick="delete_cookie('stats'); clearValues(); refreshPage();">Reset</a>)</font></h1></div>
+
+        <section id="main">
+            <div id="message"></div>
+            <div id="default"></div>
+            <div id="player"></div>
+            <div id="house"></div>
+            <div id="buttons"></div>
+        </section>
+        <div id="stats"></div>
 
         <script>
             // default page, with start button
             if (getStoredValue('start') != "1") {
-                document.write(show_default());
+                show_default();
             } else { // in game
                 // stay with hand
                 if (getStoredValue('stay') == '1') {
                     // house hand
-                    document.write(show_house());
+                    show_house();
 
-                    document.write(show_gameover());
+                    show_gameover();
                 } else {
                     // house hand
-                    document.write(show_house());
+                    show_house();
 
                     // hit me, show game over or current hand
                     if (gameover) {
                         set_stats();    
                     
-                        document.write(show_gameover());
+                        show_gameover();
                     } else
-                        document.write(show_game());
+                        show_game();
                 }
             }
-            
-            document.write('<br /><br /><br />');
 
             // show stats
-            document.write(show_stats());
+            show_stats();
         </script>
     </body>
 </html>

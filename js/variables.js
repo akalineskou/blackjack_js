@@ -4,7 +4,6 @@ var card_count = 52;
 // blackjack variables
 var total_wins = 0;
 var total_losses = 0;
-var total_games = 0;
 var points = 0;
 var housePoints = 0;
 var aces = 0;
