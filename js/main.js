@@ -6,13 +6,13 @@ var win = 0;
 // clear everything
 if (getURLParameter('clear'))
 {
-    delete_cookie('stats');
+    eraseCookie('stats');
     clearValues();
 }
 
 if (getStoredValue('newgame') == "1")
     clearValues();
-            
+
 // get previous games stats
 get_stats();
 
@@ -28,6 +28,7 @@ else
     }
     else
     {
+        // at the start, random 2 cards
         if (getStoredValue('start') == "1")
             for (i = 0; i <= 1; i++)
                 card_ids[i] = random_card();
@@ -59,6 +60,8 @@ for (i = 0; i < Object.size(card_ids); i++)
 for (i = 0; i < aces; i++)
     points += (points < 11 && aces - i == 1 ? 11 : 1);
 
+if (points == 21)
+    win = 1;
 
 if (points >= 21 || win)
 {
@@ -111,6 +114,8 @@ function show_game()
 
 function show_gameover()
 {
+    clearValues();
+    
     html_ouput =
     '<table cellspacing=0 cellpadding=3 width=400>' +
     '<tr><td colspan=2 cellspacing=0 cellpadding=5 align=center>' +
@@ -156,18 +161,15 @@ function set_stats()
     stats['total_losses'] = total_losses;
     
     create_cookie('stats', stats);
-//storeValue('stats', JSON.stringify(stats));
 }
 
 function get_stats()
 {
     // get total wins/losses
     stats = read_cookie('stats');
-
+    
     if (stats != null)
     {
-        //stats = JSON.parse(getStoredValue('stats'));
-        
         total_wins = stats['total_wins'];
         total_losses = stats['total_losses'];
     }

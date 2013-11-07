@@ -18,8 +18,6 @@
         <div align="center"><h1>Blackjack(<a href="" onclick="delete_cookie('stats'); clearValues(); gotopage();">Reset</a>)</h1></div>
 
         <script>
-            //clearStorage(1);
-            
             if (getStoredValue('start') != "1")
             {
                 document.write(show_default());
@@ -43,6 +41,8 @@
                         set_stats();    
                     
                         document.write(show_gameover());
+                        
+                        //clearValues();
                     }
                     else
                         document.write(show_game());
