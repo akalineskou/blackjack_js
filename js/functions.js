@@ -15,26 +15,31 @@ function random_card()
 
 // store/get/remove local values
 function storeValue(key, value) {
-    if (localStorage) {
-        localStorage.setItem(key, value);
-    } else {
-        $.cookies.set(key, value);
-    }
+    localStorage.setItem(key, value);
 }
 function getStoredValue(key) {
-    if (localStorage) {
-        return localStorage.getItem(key);
-    } else {
-        return $.cookies.get(key);
-    }
+    return localStorage.getItem(key);
 }
 function removeValue(key) {
-    if (localStorage) {
-        localStorage.removeItem(key);
-    }
+    localStorage.removeItem(key);
 }
 function clearValues() {
     localStorage.clear();
+}
+
+// create, read, delete cookies
+function create_cookie(name, value) {
+    var cookie = [name, '=', JSON.stringify(value), '; domain=.', window.location.host.toString(), '; path=/;'].join('');
+    document.cookie = cookie;
+}
+function read_cookie(name) {
+    var result = document.cookie.match(new RegExp(name + '=([^;]+)'));
+    result && (result = JSON.parse(result[1]));
+ 
+    return result;
+}
+function delete_cookie(name) {
+    document.cookie = [name, '=; expires=Thu, 01-Jan-1970 00:00:01 GMT; path=/; domain=.', window.location.host.toString()].join('');
 }
 
 
@@ -58,3 +63,7 @@ Object.size = function(obj) {
     }
     return size;
 };
+
+function getURLParameter(name) {
+    return decodeURIComponent((new RegExp('[?|&]' + name + '=' + '([^&;]+?)(&|#|;|$)').exec(location.search)||[,""])[1].replace(/\+/g, '%20'))||null
+}

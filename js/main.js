@@ -1,20 +1,40 @@
-var card_ids = {}; //{}
+var card_ids = new Object();
 var points = aces = 0;
 var showcards = '';
+var win = 0;
 
-if (getStoredValue('hitme'))
+// clear everything
+if (getURLParameter('clear'))
 {
-    card_ids = JSON.parse(getStoredValue('card_ids'));
-    card_ids[Object.size(card_ids)] = random_card();
+    delete_cookie('stats');
+    clearValues();
 }
+
+if (getStoredValue('newgame') == "1")
+    clearValues();
+            
+// get previous games stats
+get_stats();
+
+if (getStoredValue('stay') == '1')
+    card_ids = JSON.parse(getStoredValue('card_ids'));
 else
 {
-    // draw 2 random cards
-    for (i = 0; i <= 1; i++)
-        card_ids[i] = random_card();
+    // get old cards on hit me + add a new one
+    if (getStoredValue('hitme') == "1")
+    {
+        card_ids = JSON.parse(getStoredValue('card_ids'));
+        card_ids[Object.size(card_ids)] = random_card();
+    }
+    else
+    {
+        if (getStoredValue('start') == "1")
+            for (i = 0; i <= 1; i++)
+                card_ids[i] = random_card();
+    }
 }
 
-// for each card calculate the points
+// for each card calculate the points, and image to show
 for (i = 0; i < Object.size(card_ids); i++)
 {
     // current card id
@@ -32,11 +52,22 @@ for (i = 0; i < Object.size(card_ids); i++)
     
     showcards += "<img src='img/" + card_info[card_id]['card'] + ".bmp' border=0 /> ";
 }
+
 /* count aces
  ** points >= 11 then add 1, else 11
  */
 for (i = 0; i < aces; i++)
     points += (points < 11 && aces - i == 1 ? 11 : 1);
+
+
+if (points >= 21 || win)
+{
+    // add the current game to the stats
+    calculate_stats();
+    
+    // set the stats
+    set_stats();
+}
 
 function show_default()
 {
@@ -68,7 +99,7 @@ function show_game()
     if (points > 10)
     {
         html_ouput +=
-        '<input type="button" value="Stay" onclick="storeValue(\'stay\', 1); gotopage()">';
+        '<input type="button" value="Stay" onclick="storeValue(\'card_ids\', JSON.stringify(card_ids)); storeValue(\'stay\', 1); gotopage()">';
     }
 
     html_ouput +=
@@ -83,11 +114,12 @@ function show_gameover()
     html_ouput =
     '<table cellspacing=0 cellpadding=3 width=400>' +
     '<tr><td colspan=2 cellspacing=0 cellpadding=5 align=center>' +
+    '<div align="center"><h1>' + gameover_message() + '</h1></div>' +
     '<table width="100%" cellspacing=0 cellpadding=10 bgcolor=white>' +
     '<tr><td align=center>' + showcards + '</td></tr>' +
-    '<tr><td align=left>Points = ' + points + '</td></tr>' +
+    '<tr><td align=center>Points = ' + points + '</td></tr>' +
     '<tr><td align=center>' +
-    '<input type="button" value="New Game!" onclick="clearValues(); gotopage()">' +
+    '<input type="button" value="New Game!" onclick="storeValue(\'newgame\', 1); gotopage()">' +
     '</td></tr></table>' +
     '</td></tr></table>';
     
@@ -102,13 +134,46 @@ function show_stats()
     '<table cellspacing=0 cellpadding=3 width=400>' +
     '<tr><td colspan=2 cellspacing=0 cellpadding=5 align=center>' +
     '<div align="center"><h1>Personal Statistics</h1></div>' +
-    '<tr><td align=left><b>Wins</b></td><td align=center><b></b></td></tr>' +
-    '<tr><td align=left><b>Losses</b></td><td align=center><b></b></td></tr>' +
-    '<tr><td align=left><b>Games Played</b></td><td align=center><b></b></td></tr>' +
-    '<tr><td align=left><b>Win Percentage</b></td><td align=center><b></b></td></tr>' +
-    '<tr><td align=left><b>+/-</b></td><td align=center><b></b></td></tr>' +
+    '<tr><td align=left><b>Wins</b></td><td align=center><b>' + total_wins + '</b></td></tr>' +
+    '<tr><td align=left><b>Losses</b></td><td align=center><b>' + total_losses + '</b></td></tr>' +
+    '<tr><td align=left><b>Games Played</b></td><td align=center><b>' + (total_wins + total_losses) + '</b></td></tr>' +
+    '<tr><td align=left><b>Win Percentage</b></td><td align=center><b>' + (total_losses == 0 ? (total_wins == 0 ? "---" : "100%") : (total_wins == 0 ? "0" : (total_wins/(total_wins + total_losses))*100)+'%') + '</b></td></tr>' +
     '</td></tr></table>';
 
     return html_output;
 }
- 
+
+function gameover_message()
+{
+    return (!win ? "You Lose!" : "You Win!");
+}
+
+function set_stats()
+{
+    stats = new Object();
+    
+    stats['total_wins'] = total_wins;
+    stats['total_losses'] = total_losses;
+    
+    create_cookie('stats', stats);
+//storeValue('stats', JSON.stringify(stats));
+}
+
+function get_stats()
+{
+    // get total wins/losses
+    stats = read_cookie('stats');
+
+    if (stats != null)
+    {
+        //stats = JSON.parse(getStoredValue('stats'));
+        
+        total_wins = stats['total_wins'];
+        total_losses = stats['total_losses'];
+    }
+}
+
+function calculate_stats()
+{
+    win ? total_wins++ : total_losses++;
+}
