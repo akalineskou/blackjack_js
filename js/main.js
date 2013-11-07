@@ -4,12 +4,13 @@ var showcards = '';
 var win = 0;
 
 // clear everything
-if (getURLParameter('clear'))
+if (getURLParameter('clear') == "1")
 {
     eraseCookie('stats');
     clearValues();
 }
 
+// clear on new game
 if (getStoredValue('newgame') == "1")
     clearValues();
 
@@ -60,9 +61,11 @@ for (i = 0; i < Object.size(card_ids); i++)
 for (i = 0; i < aces; i++)
     points += (points < 11 && aces - i == 1 ? 11 : 1);
 
+// win at 21 points
 if (points == 21)
     win = 1;
 
+// at the end of the game
 if (points >= 21 || win)
 {
     // add the current game to the stats
