@@ -1,19 +1,25 @@
 // reload the page with where added
-function gotopage(where)
-{
+function gotopage(where) {
     var path = window.location.pathname;
-    var page = path.substr( path.lastIndexOf("/") + 1 );
+    var page = path.substr(path.lastIndexOf("/") + 1);
     
     window.location = page + (where != undefined ? "?" + where : '');
 }
 
 // returns number 1-52
-function random_card()
-{
+function random_card() {
     return Math.floor((Math.random()*card_count)+1);
 }
 
-// store/get/remove local values
+// html output functions
+function table_start() {
+    return '<table width="25%" cellspacing=0 cellpadding=10 align="center">';
+}
+function table_end() {
+    return '</table>';
+}
+
+// store/get/remove/clear local values
 function storeValue(key, value) {
     localStorage.setItem(key, value);
 }
@@ -64,6 +70,7 @@ Object.size = function(obj) {
     return size;
 };
 
+// returns get parameters from url
 function getURLParameter(name) {
     return decodeURIComponent((new RegExp('[?|&]' + name + '=' + '([^&;]+?)(&|#|;|$)').exec(location.search)||[,""])[1].replace(/\+/g, '%20'))||null
 }

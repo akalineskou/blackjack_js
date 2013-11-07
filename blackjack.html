@@ -12,37 +12,39 @@
         <div align="center"><h1>Blackjack(<a href="" onclick="delete_cookie('stats'); clearValues(); gotopage();">Reset</a>)</h1></div>
 
         <script>
-            if (getStoredValue('start') != "1")
-            {
+            // default page, with start button
+            if (getStoredValue('start') != "1") {
                 document.write(show_default());
-            }
-            else
-            {
-                if (getStoredValue('stay') == '1')
-                {
+            } else { // in game
+                // stay with hand
+                if (getStoredValue('stay') == '1') {
                     // add the current game to the stats
                     calculate_stats();
     
                     // set the stats
                     set_stats();
-    
+                    
+                    // house hand
+                    document.write(show_house());
+                    
                     document.write(show_gameover());
-                }
-                else
-                {
-                    if (points >= 21 || win)
-                    {
+                } else {
+                    // house hand
+                    document.write(show_house());
+
+                    // hit me, show game over or current hand
+                    if (points >= 21 || win) {
                         set_stats();    
                     
                         document.write(show_gameover());
-                        
-                        //clearValues();
-                    }
-                    else
+                    } else
                         document.write(show_game());
                 }
             }
             
+            document.write('<br /><br /><br />');
+
+            // show stats
             document.write(show_stats());
         </script>
     </body>
