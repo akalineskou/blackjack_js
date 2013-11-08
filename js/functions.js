@@ -25,8 +25,8 @@ function houseNewCard() {
         }
     }
 
-    // if house points < 10 or small card draw another card
-    if (locHousePoints < 10 && tempBool)
+    // if house points <= 12 or small card draw another card
+    if (locHousePoints <= 12 && tempBool)
         house_card_ids[Object.size(house_card_ids)] = random_card();
 
     locHousePoints = calcHouseHand();
