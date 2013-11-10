@@ -108,8 +108,8 @@ function show_default() {
     // set default html output visible
     setInnerHTML('default', html_output);
 
-    var can_play = "(no_money ? \"alert(\'You can\\\\\'t play because you have no money to bet!\')\" : \"storeValue('start', 1)\")";
-    button_output = '<input type="button" value="Start Game" onclick="'+eval(can_play)+'; refreshPage()">';
+    var can_play = "(no_money ? \"alert(\'You can\\\\\'t play because you have no money to bet!\');\" : \"storeValue('start', 1); refreshPage();\")";
+    button_output = '<input type="button" value="Start Game" onclick="'+eval(can_play)+'">';
     setInnerHTML('buttons', button_output);
 }
 function show_game() {
