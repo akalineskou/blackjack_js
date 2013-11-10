@@ -2,10 +2,6 @@ var card_ids = new Object();
 var house_card_ids = new Object();
 var showcards = '';
 
-// clear values on new game
-if (getStoredValue('newgame') == "1")
-    clearValues();
-
 // get previous games stats
 get_stats();
 
@@ -20,6 +16,7 @@ if (getStoredValue('stay') == '1') {
 
     house_card_ids = JSON.parse(getStoredValue('house_card_ids'));
 
+    // calculate if house needs to draw
     houseNewCard();
 
     gameover = 1;
@@ -31,7 +28,11 @@ if (getStoredValue('stay') == '1') {
 
         house_card_ids = JSON.parse(getStoredValue('house_card_ids'));
 
+        // calculate if house needs to draw
         houseNewCard();
+
+        // remove hit me after drawing a card
+        removeValue('hitme');
     } else {
         // at the start, random 2 cards
         if (getStoredValue('start') == "1")
@@ -43,6 +44,14 @@ if (getStoredValue('stay') == '1') {
             // house hand
             for (i = 0; i <= 1; i++)
                 house_card_ids[i] = random_card();
+        }
+        
+        // get old values if refresh when in a game
+        if (inMiddleOfGame()) {
+            card_ids = JSON.parse(getStoredValue('card_ids'));
+            house_card_ids = JSON.parse(getStoredValue('house_card_ids'));
+
+            get_money_bet();
         }
     }
 }
@@ -113,6 +122,8 @@ function show_default() {
     setInnerHTML('buttons', button_output);
 }
 function show_game() {
+    // remove start, on refresh the old cards remain
+    removeValue('start');
     var html_output =
     '<span class="valign"><h1 class="noPad">Your hand</h1><br>' + showcards + '<br>' +
     '<b>Points = ' + points + '</b><br></span>';
@@ -120,11 +131,12 @@ function show_game() {
     // set player html output visible
     setInnerHTML('player', html_output);
 
+    storeValue('card_ids', JSON.stringify(card_ids));
+    storeValue('house_card_ids', JSON.stringify(house_card_ids));
+    storeValue('bet_amount', bet_amount);
+
     var button_output = 
     '<input type="button" value="Hit me" onclick="'+
-        'storeValue(\'card_ids\', JSON.stringify(card_ids)); ' +
-        'storeValue(\'house_card_ids\', JSON.stringify(house_card_ids)); '+
-        'storeValue(\'bet_amount\', bet_amount); '+
         'storeValue(\'hitme\', 1); '+
         'refreshPage()"'+
     '>';
@@ -132,9 +144,6 @@ function show_game() {
     if (points > 10) {
         button_output +=
         '&nbsp;<input type="button" value="&nbsp;Stay&nbsp;" onclick="'+
-            'storeValue(\'card_ids\', JSON.stringify(card_ids)); ' +
-            'storeValue(\'house_card_ids\', JSON.stringify(house_card_ids)); '+
-            'storeValue(\'bet_amount\', bet_amount); '+
             'storeValue(\'stay\', 1); '+
             'refreshPage()"'+
         '>';
@@ -154,7 +163,7 @@ function show_gameover() {
     // set player html output visible
     setInnerHTML('player', html_output);
 
-    var button_output = '<input type="button" value="Main Menu" onclick="storeValue(\'newgame\', 1); refreshPage()">';
+    var button_output = '<input type="button" value="Main Menu" onclick="refreshPage()">';
     setInnerHTML('buttons', button_output);
 
     // set title visible

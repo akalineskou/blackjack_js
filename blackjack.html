@@ -38,7 +38,7 @@
             showTotalMoney();
 
             // default page, with start button
-            if (getStoredValue('start') != "1") {
+            if (getStoredValue('start') != "1" && !inMiddleOfGame()) {
                 // displays the bet amount options, disabled by default
                 betAmountSetSelect();
 

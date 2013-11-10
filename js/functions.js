@@ -61,6 +61,12 @@ function calcHouseHand() {
     return locPoints;
 }
 
+function inMiddleOfGame() {
+    return (getStoredValue('card_ids') !== null &&
+            getStoredValue('house_card_ids') !== null &&
+            getStoredValue('bet_amount') !== null ? true : false);
+}
+
 // set name html output visible
 function setInnerHTML(name, value){
     var div = document.getElementById(name);
@@ -68,11 +74,13 @@ function setInnerHTML(name, value){
     div.innerHTML = value;
 }
 
+// for layout dynamic fixes
 function setSectionHeight(height) {
     var div = document.getElementById('main');
     div.style.height = height + "px";
 }
 
+// html for select values for the bets
 function betAmountSetSelect() {
     var html_output = '<select id="select_bet" onchange="set_bet()">';
 
@@ -82,6 +90,8 @@ function betAmountSetSelect() {
 
     document.getElementById('in_bet').innerHTML = (total_money > 0 ? html_output : '0');
 }
+
+// set bet amount and total money
 function showBetAmount() {
     document.getElementById('in_bet').innerHTML = bet_amount + "$";
 }
@@ -137,9 +147,4 @@ function log(msg) {
     setTimeout(function() {
         throw new Error("#" + msg +"#");
     }, 0);
-}
-function showStorage() {
-    for (var i = 0; i < localStorage.length; i++){
-        log("storage["+localStorage.key(i)+"]: " + localStorage.getItem(localStorage.key(i)));
-    }
 }
