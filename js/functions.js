@@ -1,4 +1,4 @@
-// reload the page with where added
+// refresh the page
 function refreshPage() {
     var path = window.location.pathname;
     var page = path.substr(path.lastIndexOf("/") + 1);
