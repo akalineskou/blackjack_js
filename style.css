@@ -23,8 +23,8 @@ pre {
 	font-size:140%;
 }
 
-div#title {
-	width: 52.5%;
+section.title_sec {
+	width: 53%;
 
 	line-height: 60px;
 	height: 60px;
@@ -34,6 +34,20 @@ div#title {
 	margin-right: auto ;
 
 	background: #202020;
+	border-radius: 15px;
+}
+div#total_money_title {
+	float: left;
+	width: 40%;
+}
+div#title {
+	width: 24%;
+
+	float: left;
+}
+div#bet {
+	width: 35%;
+	float: left;
 }
 div#message {
 	line-height: 75px;
@@ -43,7 +57,7 @@ div#message {
 	display: none;
 }
 
-section {
+section.main_sec {
 	width: 50%;
 	height: 240px;
 
@@ -53,7 +67,6 @@ section {
 
 	background: gray;
 }
-
 div#default {
 	line-height: 200px;
 	height: 200px;

@@ -8,18 +8,21 @@ function refreshPage() {
 
 // returns number 1-52
 function random_card() {
+    // random seed
+    Math.seedrandom("Hlektr0n!k0 Emp0r!0", true);
+
     return Math.floor((Math.random()*card_count)+1);
 }
 
 // calculates if the house should draw cards
 function houseNewCard() {
     var locHousePoints = calcHouseHand();
-    var tempBool = 0;
+    var tempBool = false;
 
     // if house hand has a small card(not ace) draw another card
-    for (i = 0; i < Object.size(house_card_ids); i++) {
-        if (card_info[house_card_ids[i]]['points'] >= 2 && card_info[house_card_ids[i]]['points'] <= 5) {
-            tempBool = 1;
+    for (var i = 0; i < Object.size(house_card_ids); i++) {
+        if (card_info[house_card_ids[i]]['points'] >= 2 && card_info[house_card_ids[i]]['points'] <= 6) {
+            tempBool = true;
 
             break;
         }
@@ -39,13 +42,9 @@ function calcHouseHand() {
     var locPoints = 0;
     var locAces = 0;
 
-    for (i = 0; i < Object.size(house_card_ids); i++) {
+    for (var i = 0; i < Object.size(house_card_ids); i++) {
         // current card id
         var hand_card_id = house_card_ids[i];
-        
-        // if same card, random another
-        while (hand_card_id in house_card_ids)
-            hand_card_id = random_card();
 
         // add the card points
         if (card_info[hand_card_id]['points'] == 1) // ace
@@ -64,14 +63,30 @@ function calcHouseHand() {
 
 // set name html output visible
 function setInnerHTML(name, value){
-    div = document.getElementById(name);
+    var div = document.getElementById(name);
     div.style.display = 'block';
     div.innerHTML = value;
 }
 
 function setSectionHeight(height) {
-    div = document.getElementById('main');
+    var div = document.getElementById('main');
     div.style.height = height + "px";
+}
+
+function betAmountSetSelect() {
+    var html_output = '<select id="select_bet" onchange="set_bet()">';
+
+    for (i = 1; i <= Object.size(bet_info); i++)
+        html_output += '<option value="'+ i +'"' + (i == 1 ? 'selected' : '') + '>'+ bet_info[i]['name'] + (i == 5 ? '' : '$') + '</option>';
+    html_output += '</select>';
+
+    document.getElementById('in_bet').innerHTML = (total_money > 0 ? html_output : '0');
+}
+function showBetAmount() {
+    document.getElementById('in_bet').innerHTML = bet_amount + "$";
+}
+function showTotalMoney() {
+    document.getElementById('total_money').innerHTML = total_money;
 }
 
 // store/get/remove/clear local values
@@ -88,7 +103,7 @@ function clearValues() {
     localStorage.clear();
 }
 
-// create, read, delete cookies
+// create/read/delete cookies
 function create_cookie(name, value) {
     var cookie = [name, '=', JSON.stringify(value), '; path=/;'].join('');
     document.cookie = cookie;
@@ -102,7 +117,20 @@ function read_cookie(name) {
 function delete_cookie(name) {
     document.cookie = name + '=; expires=Thu, 01-Jan-1970 00:00:01 GMT; path=/';
 }
+function erase_cookies() {
+    var cookies = document.cookie.split(";");
+    for (var i = 0; i < cookies.length; i++)
+        delete_cookie(cookies[i].split("=")[0]);
+}
 
+// get associative array size(object)
+Object.size = function(obj) {
+    var size = 0, key;
+    for (key in obj) {
+        if (obj.hasOwnProperty(key)) size++;
+    }
+    return size;
+};
 
 // debug function, output to console
 function log(msg) {
@@ -115,12 +143,3 @@ function showStorage() {
         log("storage["+localStorage.key(i)+"]: " + localStorage.getItem(localStorage.key(i)));
     }
 }
-
-// get associative array size(object)
-Object.size = function(obj) {
-    var size = 0, key;
-    for (key in obj) {
-        if (obj.hasOwnProperty(key)) size++;
-    }
-    return size;
-};

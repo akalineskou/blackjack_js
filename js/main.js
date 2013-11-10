@@ -9,6 +9,11 @@ if (getStoredValue('newgame') == "1")
 // get previous games stats
 get_stats();
 
+// get money/bet
+get_money_bet();
+
+no_money = (total_money <= 0 ? true : false);
+
 // if stay, get previous card ids
 if (getStoredValue('stay') == '1') {
     card_ids = JSON.parse(getStoredValue('card_ids'));
@@ -46,10 +51,6 @@ if (getStoredValue('stay') == '1') {
 for (i = 0; i < Object.size(card_ids); i++) {
     // current card id
     var card_id = card_ids[i];
-    
-    // if same card, random another
-    while (card_id in card_ids)
-        card_id = random_card();
 
     // add the points
     if (card_info[card_id]['points'] == 1) // ace
@@ -89,10 +90,16 @@ if (gameover) {
     
     // set the stats
     set_stats();
+
+    // calculate money before saving it
+    calculate_money();
+
+    // set total money
+    set_money();
 }
 
 function show_default() {
-    html_output =
+    var html_output =
     '<span class="valign">' +
     '<img src="img/as.bmp">&nbsp;<img src="img/js.bmp"><br><br>' +
     'The aim of the game is to accumulate a higher<br />point total than the dealer, but without going over 21.<br>' +
@@ -101,25 +108,36 @@ function show_default() {
     // set default html output visible
     setInnerHTML('default', html_output);
 
-    button_output = '<input type="button" value="Start Game" onclick="storeValue(\'start\', 1); refreshPage()">';
+    var can_play = "(no_money ? \"alert(\'You can\\\\\'t play because you have no money to bet!\')\" : \"storeValue('start', 1)\")";
+    button_output = '<input type="button" value="Start Game" onclick="'+eval(can_play)+'; refreshPage()">';
     setInnerHTML('buttons', button_output);
 }
 function show_game() {
-    html_output =
+    var html_output =
     '<span class="valign"><h1 class="noPad">Your hand</h1><br>' + showcards + '<br>' +
     '<b>Points = ' + points + '</b><br></span>';
 
     // set player html output visible
     setInnerHTML('player', html_output);
 
-    button_output = 
-    '<input type="button" value="Hit me" onclick="storeValue(\'card_ids\', JSON.stringify(card_ids)); ' +
-    'storeValue(\'house_card_ids\', JSON.stringify(house_card_ids)); storeValue(\'hitme\', 1); refreshPage()">';
+    var button_output = 
+    '<input type="button" value="Hit me" onclick="'+
+        'storeValue(\'card_ids\', JSON.stringify(card_ids)); ' +
+        'storeValue(\'house_card_ids\', JSON.stringify(house_card_ids)); '+
+        'storeValue(\'bet_amount\', bet_amount); '+
+        'storeValue(\'hitme\', 1); '+
+        'refreshPage()"'+
+    '>';
 
     if (points > 10) {
         button_output +=
-        '&nbsp;<input type="button" value="&nbsp;Stay&nbsp;" onclick="storeValue(\'card_ids\', JSON.stringify(card_ids)); ' +
-        'storeValue(\'house_card_ids\', JSON.stringify(house_card_ids)); storeValue(\'stay\', 1); refreshPage()">';
+        '&nbsp;<input type="button" value="&nbsp;Stay&nbsp;" onclick="'+
+            'storeValue(\'card_ids\', JSON.stringify(card_ids)); ' +
+            'storeValue(\'house_card_ids\', JSON.stringify(house_card_ids)); '+
+            'storeValue(\'bet_amount\', bet_amount); '+
+            'storeValue(\'stay\', 1); '+
+            'refreshPage()"'+
+        '>';
     }
 
     setInnerHTML('buttons', button_output);
@@ -128,7 +146,7 @@ function show_gameover() {
     // clear values on game over
     clearValues();
     
-    html_output =
+    var html_output =
     '<span class="valign"><h1 class="noPad">Your hand</h1><br>' +
     showcards + '<br>' +
     '<b>Points = ' + points + '</b></span>';
@@ -136,11 +154,11 @@ function show_gameover() {
     // set player html output visible
     setInnerHTML('player', html_output);
 
-    button_output = '<input type="button" value="Main Menu" onclick="storeValue(\'newgame\', 1); refreshPage()">';
+    var button_output = '<input type="button" value="Main Menu" onclick="storeValue(\'newgame\', 1); refreshPage()">';
     setInnerHTML('buttons', button_output);
 
     // set title visible
-    div = document.getElementById('message');
+    var div = document.getElementById('message');
     div.style.background = (win ? "green" : "#CD0000");
     div.style.color = "white";
     div.style.display = 'block';
@@ -150,12 +168,12 @@ function show_gameover() {
     setSectionHeight(315);
 }
 function show_house() {
-    html_output = '<span class="valign"><h1 class="noPad">Dealer\'s Hand</h1><br>';
+    var html_output = '<span class="valign"><h1 class="noPad">Dealer\'s Hand</h1><br>';
 
     var locPoints = 0;
 
     // show house_card_ids size -1 cards, the last one is turned around, unless game ends
-    for (i = 0; i < Object.size(house_card_ids); i++) {
+    for (var i = 0; i < Object.size(house_card_ids); i++) {
         if ((getStoredValue('stay') == '1' || gameover) || i + 1 < Object.size(house_card_ids)) {
             html_output += "<img src='img/" + card_info[house_card_ids[i]]['card'] + ".bmp' />";
 
@@ -174,16 +192,7 @@ function show_house() {
 }
 
 function show_stats() {
-    html_output = '<span class="valign"><h1>Statistics</h1><table>' +
-    '<tr><td align=left>Wins</td><td align=center><b>' + total_wins + '</b></td></tr>' +
-    '<tr><td align=left>Losses</td><td align=center><b>' + total_losses + '</b></td></tr>' +
-    '<tr><td align=left>Games Played</td><td align=center><b>' + (total_wins + total_losses) + '</b></td></tr>' +
-    '<tr><td align=left>Win Percentage</td><td align=center><b>' +
-    (total_losses == 0 ? (total_wins == 0 ? "---" : "100%") :
-                         (total_wins == 0 ? "0" : (total_wins/(total_wins + total_losses))*100)+'%') +
-    '</b></td></tr></table></span>';
-
-    html_output = '<span class="valign"><h1>Statistics</h1><pre>' +
+    var html_output = '<span class="valign"><h1>Statistics</h1><pre>' +
     'Wins                   <b>' + total_wins + '</b><br>' +
     'Losses                 <b>' + total_losses + '</b><br>' +
     'Games Played           <b>' + (total_wins + total_losses) + '</b><br>' +
@@ -199,16 +208,17 @@ function gameover_message() {
 
 // set/get/calc stats
 function set_stats() {
-    stats = new Object();
+    var stats = new Object();
     
     stats['total_wins'] = total_wins;
     stats['total_losses'] = total_losses;
     
     create_cookie('stats', stats);
 }
+// get total wins/losses
 function get_stats() {
-    // get total wins/losses
-    stats = read_cookie('stats');
+    
+    var stats = read_cookie('stats');
     
     if (stats != null)
     {
@@ -218,4 +228,35 @@ function get_stats() {
 }
 function calculate_stats() {
     win ? total_wins++ : total_losses++;
+}
+
+// save money between refresh
+function set_money() {
+    create_cookie('total_money', total_money);
+}
+// get total money and bet between refreshes
+function get_money_bet() {
+    // if null default value, else stored value
+    total_money = read_cookie('total_money') === null ? total_money : read_cookie('total_money');
+    bet_amount = (getStoredValue('bet_amount') === null ? bet_amount : getStoredValue('bet_amount'));
+}
+// save money between refresh
+function set_bet() {
+    // get value of select
+    var locBet = document.getElementById('select_bet').value;
+    var found = false;
+
+    // check to see if bet value is correct
+    for (var bet in bet_info)
+        if (bet == locBet)
+            found = true;
+
+    // set bet amount to selected bet, or all money if all in
+    bet_amount = (!found ? bet_amount : (locBet != 5 ? bet_info[locBet]['value'] : total_money));
+    storeValue('bet_amount', bet_amount);
+
+}
+// add/substract total money if win or loss
+function calculate_money() {
+    total_money = (win ? parseInt(total_money) + parseInt(bet_amount) : parseInt(total_money) - parseInt(bet_amount));
 }

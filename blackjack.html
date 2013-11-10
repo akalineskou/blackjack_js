@@ -5,15 +5,26 @@
         <meta charset="utf-8">
         <link rel="stylesheet" type="text/css" href="style.css">
 
+        <script src="js/seedrandom.js"></script>
         <script src="js/variables.js"></script>
         <script src="js/functions.js"></script>
         <script src="js/main.js"></script>
     </head>
     <body>
         <br><br><br><br>
-        <div id="title"><h1 class="noPad">Blackjack<font class="small">(<a href="" title="Clear everything + statistics" onclick="delete_cookie('stats'); clearValues(); refreshPage();">Reset</a>)</font></h1></div>
+        <section class="title_sec">
+            <div id="total_money_title">
+                Total money: <div id="total_money" style="display:inline"></div>$
+            </div>
+            <div id="title">
+                <h1 class="noPad">Blackjack<font class="small">(<a href="" title="Restore everything to default" onclick="erase_cookies(); clearValues(); refreshPage();">Reset</a>)</font></h1>
+            </div>
+            <div id="bet">
+                Bet amount: <div id="in_bet" style="display:inline"></div>
+            </div>
+        </section>
 
-        <section id="main">
+        <section id="main" class="main_sec">
             <div id="message"></div>
             <div id="default"></div>
             <div id="player"></div>
@@ -23,10 +34,20 @@
         <div id="stats"></div>
 
         <script>
+            // sets total money in the title div
+            showTotalMoney();
+
             // default page, with start button
             if (getStoredValue('start') != "1") {
+                // displays the bet amount options, disabled by default
+                betAmountSetSelect();
+
+                // default screen
                 show_default();
             } else { // in game
+                // shows user bet amount
+                showBetAmount();
+
                 // stay with hand
                 if (getStoredValue('stay') == '1') {
                     // house hand
@@ -38,11 +59,9 @@
                     show_house();
 
                     // hit me, show game over or current hand
-                    if (gameover) {
-                        set_stats();    
-                    
+                    if (gameover)
                         show_gameover();
-                    } else
+                    else
                         show_game();
                 }
             }
