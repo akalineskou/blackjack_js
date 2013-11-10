@@ -212,7 +212,7 @@ function show_stats() {
 }
 
 function gameover_message() {
-    return (!win ? "You Lose" : "You Win");
+    return (!win ? "You Lose " : "You Win ") + bet_amount + "$";
 }
 
 // set/get/calc stats
