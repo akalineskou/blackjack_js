@@ -67,7 +67,7 @@ for (i = 0; i < Object.size(card_ids); i++) {
     else
         points += card_info[card_id]['points'];
     
-    showcards += "<img src='img/" + card_info[card_id]['card'] + ".bmp' /> ";
+    showcards += "<img src='img/" + card_info[card_id]['card'] + ".bmp'> ";
 }
 
 /* count aces
@@ -111,7 +111,7 @@ function show_default() {
     var html_output =
     '<span class="valign">' +
     '<img src="img/as.bmp">&nbsp;<img src="img/js.bmp"><br><br>' +
-    'The aim of the game is to accumulate a higher<br />point total than the dealer, but without going over 21.<br>' +
+    'The aim of the game is to accumulate a higher<br>point total than the dealer, but without going over 21.<br>' +
     '</span>';
     
     // set default html output visible
@@ -170,6 +170,7 @@ function show_gameover() {
     var div = document.getElementById('message');
     div.style.background = (win ? "green" : "#CD0000");
     div.style.color = "white";
+
     div.style.display = 'block';
     div.innerHTML = '<h1 class="noPad">' + gameover_message() + '</h1>';
 
@@ -184,7 +185,7 @@ function show_house() {
     // show house_card_ids size -1 cards, the last one is turned around, unless game ends
     for (var i = 0; i < Object.size(house_card_ids); i++) {
         if ((getStoredValue('stay') == '1' || gameover) || i + 1 < Object.size(house_card_ids)) {
-            html_output += "<img src='img/" + card_info[house_card_ids[i]]['card'] + ".bmp' />";
+            html_output += "<img src='img/" + card_info[house_card_ids[i]]['card'] + ".bmp'>";
 
             locPoints += card_info[house_card_ids[i]]['points'];
         }
