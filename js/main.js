@@ -213,7 +213,7 @@ function showHouse() {
 }
 
 function showStats() {
-    var html_output = '<span class="valign"><h1>Statistics</h1><pre>' +
+    var html_output = '<span class="valign"><h1 class="bigger">Statistics</h1><pre>' +
     'Wins                   <b>' + total_wins + '</b><br>' +
     'Losses                 <b>' + total_losses + '</b><br>' +
     'Games Played           <b>' + (total_wins + total_losses) + '</b><br>' +

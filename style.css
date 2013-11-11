@@ -18,6 +18,9 @@ h1.noPad {
 	padding: 0px;
     margin: 0px;
 }
+h1.bigger {
+	font-size:220%;
+}
 .small {
 	font-size:50%;
 	vertical-align:middle;
@@ -27,8 +30,14 @@ pre {
 	font-size:140%;
 }
 
+section.full {
+	width: 820px;
+
+	margin: auto;
+}
+
 section.title_sec {
-	width: 53%;
+	width: 815px;
 
 	line-height: 60px;
 	height: 60px;
@@ -42,32 +51,32 @@ section.title_sec {
 	box-shadow: inset 1px 1px 5px, 1px 1px 10px;
 	border: 2px solid;
 
-	position:relative; top:2px;
+	position:relative;
+	top: 2px;
 }
 div#total_money_title {
 	float: left;
 	width: 30%;
 }
 div#title {
-	width: 43%;
-
-	font-size:150%;
+	width: 40%;
 
 	float: left;
 }
 div#bet {
-	width: 27%;
+	width: 30%;
 	float: left;
 }
 
 section.main_sec {
-	width: 50%;
+	width: 768px;
 	height: 240px;
 
 	margin: auto;
-	padding: 10px;
+	
 	text-align: center;
 
+	padding: 10px;
 	background: #001030;
 	border: 2px solid;
 
@@ -83,7 +92,8 @@ div#message {
 	border: 2px solid;
 	box-shadow: inset 1px 1px 5px, 1px 1px 10px;
 
-	position:relative; top:-4px
+	position:relative;
+	top:-4px
 }
 div#default {
 	line-height: 200px;
@@ -135,17 +145,19 @@ div#buttons {
 
 	display: none;
 
-	position:relative; top:-4px
+	position:relative;
+	top:-4px
 }
 
 div#stats {
 	margin: auto;
-	padding: 10px;
+	
 	text-align: center;
 
+	width: 815px;
+
 	line-height: 100px;
-	height: 120px;
-	width: 51.5%;
+	height: 135px;
 
 	margin-left: auto;
 	margin-right: auto;
@@ -154,7 +166,8 @@ div#stats {
 	border: 2px solid;
 	box-shadow: inset 1px 1px 5px, 1px 1px 10px;
 
-	position:relative; top:-2px
+	position:relative;
+	top:-2px;
 }
 
 span.valign {
@@ -217,5 +230,5 @@ a:link, a:visited, .pointer {
 	text-align: center !important;
 	width:100% !important;
 	top:25% !important;
-	background: #001030;
+	background: #001030 !important;
 }

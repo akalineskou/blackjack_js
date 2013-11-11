@@ -12,31 +12,37 @@
     </head>
     <body>
         <br><br><br><br>
-        <section class="title_sec">
-            <div id="total_money_title">
-                Total Money: <div id="total_money" style="display:inline"></div>$
-            </div>
-            <div id="title">
-                <h1 class="noPad">Blackjack<span class="small">(<a href="" title="Restore everything to default" onclick="eraseCookies(); clearValues(); reloadPage();">X</a>)</span></h1>
-            </div>
-            <div id="bet">
-                Bet Amount: <div id="in_bet" style="display:inline"></div>
-            </div>
+        
+        <section class="full">
+            <section class="title_sec">
+                <div id="total_money_title">
+                    Total Money: <div id="total_money" style="display:inline"></div>$
+                </div>
+                <div id="title">
+                    <h1 class="noPad bigger">&nbsp;&nbsp;Blackjack<span class="small">(<a href="" title="Restore everything to default" onclick="eraseCookies(); clearValues(); reloadPage();">X</a>)</span></h1>
+                </div>
+                <div id="bet">
+                    Bet Amount: <div id="in_bet" style="display:inline"></div>
+                </div>
+            </section>
+
+            <section id="main" class="main_sec">
+                <div id="message"></div>
+                <div id="default"></div>
+                <div id="player"></div>
+                <div id="house"></div>
+                <div id="buttons"></div>
+            </section>
+
+            <div id="stats"></div>
         </section>
 
-        <section id="main" class="main_sec">
-            <div id="message"></div>
-            <div id="default"></div>
-            <div id="player"></div>
-            <div id="house"></div>
-            <div id="buttons"></div>
-        </section>
-
-        <div id="stats"></div>
         <noscript>
                 <div id="message" class="noscript">Your browser does not support JavaScript!</div>
         </noscript>
-        
+
+        <br><br><br><br>
+
         <script>
             // sets total money in the title div
             showTotalMoney();
