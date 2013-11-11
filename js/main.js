@@ -220,7 +220,7 @@ function showStats() {
 }
 
 function gameoverMessage() {
-    return (!win ? "You Lose " : "You Win ") + bet_amount + "$";
+    return (!win ? "You Lost " : "You Won ") + bet_amount + "$";
 }
 
 // set/get/calc stats as cookies
