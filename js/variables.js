@@ -1,18 +1,12 @@
 // card variables
 var card_count = 52;
 
-// blackjack variables
-var total_wins = 0;
-var total_losses = 0;
-var points = 0;
-var housePoints = 0;
-var aces = 0;
-var win = 0;
-var gameover = 0;
-
 // money variables
 var total_money = 100;
 var bet_amount = 10;
+/* bet info array
+ ** name: text to show user
+ ** value: value to add to bet(5 adds total money) */
 var bet_info = {
     1 : {
         'name' : '10',
@@ -36,11 +30,10 @@ var bet_info = {
     }
 }
 
-/* cards info
+/* cards info array
  ** id - card pic, card points
  *** card num: j - jack, q - queen, k - king
- *** card pic: s - spades, d - diamonds, c - clubs, h - hearts
-*/
+ *** card pic: s - spades, d - diamonds, c - clubs, h - hearts */
 var card_info = {
     1 : {
         'card' : '2s',

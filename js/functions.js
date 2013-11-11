@@ -6,7 +6,7 @@ function refreshPage() {
     window.location = page;
 }
 
-// returns number 1-52
+// returns number from 1-52
 function random_card() {
     // random seed
     Math.seedrandom("Hlektr0n!k0 Emp0r!0", true);
@@ -34,6 +34,7 @@ function houseNewCard() {
 
     locHousePoints = calcHouseHand();
 
+    // end game if house gets 21
     if (locHousePoints == 21)
         gameover = 1;
 }
@@ -61,6 +62,7 @@ function calcHouseHand() {
     return locPoints;
 }
 
+// returns true if data from game is stored
 function inMiddleOfGame() {
     return (getStoredValue('card_ids') !== null &&
             getStoredValue('house_card_ids') !== null &&
@@ -91,7 +93,7 @@ function betAmountSetSelect() {
     document.getElementById('in_bet').innerHTML = (total_money > 0 ? html_output : '0');
 }
 
-// set bet amount and total money
+// set bet amount and total money to html
 function showBetAmount() {
     document.getElementById('in_bet').innerHTML = bet_amount + "$";
 }

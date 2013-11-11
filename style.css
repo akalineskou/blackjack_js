@@ -59,18 +59,6 @@ div#bet {
 	width: 35%;
 	float: left;
 }
-div#message {
-	line-height: 75px;
-	height: 75px;
-	width: 100%;
-
-	display: none;
-
-	border: 2px solid;
-	box-shadow: inset 1px 1px 5px, 1px 1px 10px;
-
-	position:relative; top:-4px
-}
 
 section.main_sec {
 	width: 50%;
@@ -84,6 +72,18 @@ section.main_sec {
 	border: 2px solid;
 
 	background: url('img/backcen.gif');
+}
+div#message {
+	line-height: 75px;
+	height: 75px;
+	width: 100%;
+
+	display: none;
+
+	border: 2px solid;
+	box-shadow: inset 1px 1px 5px, 1px 1px 10px;
+
+	position:relative; top:-4px
 }
 div#default {
 	line-height: 200px;

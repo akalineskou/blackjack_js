@@ -1,3 +1,11 @@
+// blackjack variables
+var total_wins = 0;
+var total_losses = 0;
+var points = 0;
+var housePoints = 0;
+var aces = 0;
+var win = 0;
+var gameover = 0;
 var card_ids = new Object();
 var house_card_ids = new Object();
 var showcards = '';
@@ -19,6 +27,7 @@ if (getStoredValue('stay') == '1') {
     // calculate if house needs to draw
     houseNewCard();
 
+    // end game on stay
     gameover = 1;
 } else {
     // get old cards on hit me + add a new one
@@ -92,7 +101,7 @@ else if (housePoints > 21) // end game and win if house hand over 21
 if (gameover && win != 1)
     win = (points < 21 && points > housePoints ? 1 : 0);
 
-// at the end of the game
+// do at the end of the game
 if (gameover) {
     // add the current game to the stats
     calculate_stats();
@@ -110,8 +119,8 @@ if (gameover) {
 function show_default() {
     var html_output =
     '<span class="valign">' +
-    '<img src="img/as.bmp">&nbsp;<img src="img/js.bmp"><br><br>' +
-    'The aim of the game is to accumulate a higher<br>point total than the dealer, but without going over 21.<br>' +
+        '<img src="img/as.bmp">&nbsp;<img src="img/js.bmp"><br><br>' +
+        'The aim of the game is to accumulate a higher<br>point total than the dealer, but without going over 21.<br>' +
     '</span>';
     
     // set default html output visible
@@ -119,18 +128,22 @@ function show_default() {
 
     var can_play = "(no_money ? \"alert(\'You can\\\\\'t play because you have no money to bet!\');\" : \"storeValue('start', 1); refreshPage();\")";
     button_output = '<input type="button" value="Start Game" onclick="'+eval(can_play)+'">';
+
     setInnerHTML('buttons', button_output);
 }
 function show_game() {
     // remove start, on refresh the old cards remain
     removeValue('start');
+
     var html_output =
     '<span class="valign"><h1 class="noPad">Your hand</h1><br>' + showcards + '<br>' +
-    '<b>Points = ' + points + '</b><br></span>';
+        '<b>Points = ' + points + '</b><br>'+
+    '</span>';
 
     // set player html output visible
     setInnerHTML('player', html_output);
 
+    // store data
     storeValue('card_ids', JSON.stringify(card_ids));
     storeValue('house_card_ids', JSON.stringify(house_card_ids));
     storeValue('bet_amount', bet_amount);
@@ -138,14 +151,14 @@ function show_game() {
     var button_output = 
     '<input type="button" value="Hit me" onclick="'+
         'storeValue(\'hitme\', 1); '+
-        'refreshPage()"'+
+        'refreshPage();"'+
     '>';
 
     if (points > 10) {
         button_output +=
         '&nbsp;<input type="button" value="&nbsp;Stay&nbsp;" onclick="'+
             'storeValue(\'stay\', 1); '+
-            'refreshPage()"'+
+            'refreshPage();"'+
         '>';
     }
 
@@ -163,14 +176,13 @@ function show_gameover() {
     // set player html output visible
     setInnerHTML('player', html_output);
 
-    var button_output = '<input type="button" value="Main Menu" onclick="refreshPage()">';
+    var button_output = '<input type="button" value="Main Menu" onclick="refreshPage();">';
     setInnerHTML('buttons', button_output);
 
     // set title visible
     var div = document.getElementById('message');
     div.style.background = (win ? "green" : "#CD0000");
     div.style.color = "white";
-
     div.style.display = 'block';
     div.innerHTML = '<h1 class="noPad">' + gameover_message() + '</h1>';
 
@@ -216,7 +228,7 @@ function gameover_message() {
     return (!win ? "You Lose " : "You Win ") + bet_amount + "$";
 }
 
-// set/get/calc stats
+// set/get/calc stats as cookies
 function set_stats() {
     var stats = new Object();
     
@@ -240,7 +252,7 @@ function calculate_stats() {
     win ? total_wins++ : total_losses++;
 }
 
-// save money between refresh
+// save money between refresh as cookie
 function set_money() {
     create_cookie('total_money', total_money);
 }
@@ -256,15 +268,15 @@ function set_bet() {
     var locBet = document.getElementById('select_bet').value;
     var found = false;
 
-    // check to see if bet value is correct
+    // check to see if bet value is valid
     for (var bet in bet_info)
         if (bet == locBet)
             found = true;
 
-    // set bet amount to selected bet, or all money if all in
+    // set bet amount to selected bet, or total money if all in
     bet_amount = (!found ? bet_amount : (locBet != 5 ? bet_info[locBet]['value'] : total_money));
-    storeValue('bet_amount', bet_amount);
 
+    storeValue('bet_amount', bet_amount);
 }
 // add/substract total money if win or loss
 function calculate_money() {
