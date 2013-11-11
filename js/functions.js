@@ -11,10 +11,35 @@ function randomCard() {
     return Math.floor((Math.random()*card_count)+1);
 }
 
+// calculate player points and set cards to show
+function calcPlayerHand() {
+    // for each card calculate it
+    for (var i = 0; i < Object.size(card_ids); i++) {
+        // current card id
+        var card_id = card_ids[i];
+
+        // add the points
+        if (card_info[card_id]['points'] == 1) // ace
+            aces++;
+        else
+            points += card_info[card_id]['points'];
+        
+        card_imgs += "<img src='img/" + card_info[card_id]['card'] + ".bmp'> ";
+    }
+
+    /* count aces
+     ** points >= 11 then add 1, else 11 */
+    for (i = 0; i < aces; i++)
+        points += (points < 11 && aces - i == 1 ? 11 : 1);
+}
+
 // calculates if the house should draw cards
-function houseNewCard() {
-    var loc_house_points = calcHouseHand();
+function houseNewCard(force_draw) {
+    // default false
+    force_draw = (force_draw === "undefined" ? false : force_draw)
+
     var temp_bool = false;
+    var loc_aces = 0;
 
     // if house hand has a small card(not ace) draw another card
     for (var i = 0; i < Object.size(house_card_ids); i++) {
@@ -22,17 +47,19 @@ function houseNewCard() {
             temp_bool = true;
 
             break;
-        }
+        } else if (card_info[house_card_ids[i]]['points'] == 1)
+            loc_aces++;
     }
 
     // if house points <= 12 or small card draw another card
-    if (loc_house_points <= 12 && temp_bool)
+    if (force_draw == true || ((house_points - (loc_aces == 1 ? 10 : 0)) <= 12 && temp_bool))
         house_card_ids[Object.size(house_card_ids)] = randomCard();
 
-    loc_house_points = calcHouseHand();
+    // calculate new house points before checking
+    calcHouseHand();
 
     // end game if house gets 21
-    if (loc_house_points == 21)
+    if (house_points == 21)
         gameover = 1;
 }
 // calculate house points
@@ -56,7 +83,7 @@ function calcHouseHand() {
     for (i = 0; i < loc_aces; i++)
         loc_points += (loc_points < 11 && loc_aces - i == 1 ? 11 : 1);
 
-    return loc_points;
+    house_points = loc_points;
 }
 
 // returns true if data from game is stored
@@ -81,10 +108,13 @@ function setSectionHeight(height) {
 
 // html for select values for the bets
 function betAmountSetSelect() {
-    var html_output = '<select id="select_bet" onchange="setBet()">';
+    var html_output = '<select id="select_bet" onchange="getBetFromSelect()">';
 
     for (var i = 1; i <= Object.size(bet_info); i++)
-        html_output += '<option value="'+ i +'"' + (i == 1 ? 'selected' : '') + '>'+ bet_info[i]['name'] + (i == 5 ? '' : '$') + '</option>';
+        html_output += '<option value="'+ i +'"' +
+                        
+                        (bet_info[i]['value'] > total_money ? ' disabled' : (i == 1 ? ' selected' : '')) +
+                        '>'+ bet_info[i]['name'] + (i == 5 ? '' : '$') + '</option>';
     html_output += '</select>';
 
     document.getElementById('in_bet').innerHTML = (total_money > 0 ? html_output : '0');
@@ -96,6 +126,22 @@ function showBetAmount() {
 }
 function showTotalMoney() {
     document.getElementById('total_money').innerHTML = total_money;
+}
+// check to see if the player can start a game if he has enough money
+function checkMoneyStart() {
+    if (total_money)
+        getBetFromSelect();
+
+    if (total_money == 0) {
+        alert('You can\'t play because you have no more money to bet!');
+    } else if (bet_amount > total_money) {
+        alert('The bet amount is more than your total money!');
+    } else {
+        // start game
+        storeValue('start', 1);
+
+        reloadPage();
+    }
 }
 
 // store/get/remove/clear local values
@@ -145,6 +191,6 @@ Object.size = function(obj) {
 // debug function, output to console
 function log(msg) {
     setTimeout(function() {
-        throw new Error(msg);
+        throw new Error('~'+msg+'~');
     }, 0);
 }

@@ -16,36 +16,41 @@ getStats();
 // get money/bet
 getMoneyBet();
 
-no_money = (total_money <= 0 ? true : false);
-
 // if stay, get previous card ids
 if (getStoredValue('stay') == '1') {
     card_ids = JSON.parse(getStoredValue('card_ids'));
-
     house_card_ids = JSON.parse(getStoredValue('house_card_ids'));
 
-    // make sure house draws if the players stays, and it has small cards
-    for (var i = 0; i < 5; i++)
-        // calculate if house needs to draw
-        houseNewCard();
+    // calculate player/house points
+    calcPlayerHand();
+    calcHouseHand();
+
+    // while the house has less points, draw since it is at the end
+    while (house_points < points)
+        houseNewCard(true);
 
     // end game on stay
     gameover = 1;
 } else {
     // get old cards on hit me + add a new one
     if (getStoredValue('hitme') == "1") {
+        // player cards
         card_ids = JSON.parse(getStoredValue('card_ids'));
         card_ids[Object.size(card_ids)] = randomCard();
 
+        // hosue cards
         house_card_ids = JSON.parse(getStoredValue('house_card_ids'));
 
         // calculate if house needs to draw
         houseNewCard();
 
+        // calculate new player points
+        calcPlayerHand();
+
         // remove hit me after drawing a card
         removeValue('hitme');
     } else {
-        // at the start, random 2 cards
+        // at the start of the game, random 2 cards for each one
         if (getStoredValue('start') == "1")
         {
             // player hand
@@ -55,6 +60,10 @@ if (getStoredValue('stay') == '1') {
             // house hand
             for (i = 0; i <= 1; i++)
                 house_card_ids[i] = randomCard();
+
+            // calculate player/house points
+            calcPlayerHand();
+            calcHouseHand();
         }
         
         // get old values if reload when in a game
@@ -62,32 +71,14 @@ if (getStoredValue('stay') == '1') {
             card_ids = JSON.parse(getStoredValue('card_ids'));
             house_card_ids = JSON.parse(getStoredValue('house_card_ids'));
 
-            getMoneyBet();
+            getMoneyBet();  
+
+            // calculate player/house points
+            calcPlayerHand();
+            calcHouseHand();
         }
     }
 }
-
-// for each card calculate the points, and image to show
-for (i = 0; i < Object.size(card_ids); i++) {
-    // current card id
-    var card_id = card_ids[i];
-
-    // add the points
-    if (card_info[card_id]['points'] == 1) // ace
-        aces++;
-    else
-        points += card_info[card_id]['points'];
-    
-    card_imgs += "<img src='img/" + card_info[card_id]['card'] + ".bmp'> ";
-}
-
-/* count aces
- ** points >= 11 then add 1, else 11 */
-for (i = 0; i < aces; i++)
-    points += (points < 11 && aces - i == 1 ? 11 : 1);
-
-// get house points
-house_points = calcHouseHand();
 
 if (points == 21 && house_points != 21) // win if at 21 and house not at 21
     win = gameover = 1;
@@ -128,8 +119,7 @@ function showDefault() {
     // set default html output visible
     setInnerHTML('default', html_output);
 
-    var can_play = "(no_money ? \"alert(\'You can\\\\\'t play because you have no money to bet!\');\" : \"storeValue('start', 1); reloadPage();\")";
-    button_output = '<input type="button" value="Start Game" onclick="'+eval(can_play)+'">';
+    button_output = '<input type="button" value="Start Game" onclick="checkMoneyStart();">';
 
     setInnerHTML('buttons', button_output);
 }
@@ -201,7 +191,7 @@ function showHouse() {
         if ((getStoredValue('stay') == '1' || gameover) || i + 1 < Object.size(house_card_ids)) {
             html_output += "<img src='img/" + card_info[house_card_ids[i]]['card'] + ".bmp'>";
 
-            loc_points += card_info[house_card_ids[i]]['points'];
+            loc_points += (card_info[house_card_ids[i]]['points'] == 1 ? 11 : card_info[house_card_ids[i]]['points']);
         }
         else
             html_output += "<img src='img/back.png'>";
@@ -265,7 +255,7 @@ function getMoneyBet() {
     bet_amount = (getStoredValue('bet_amount') === null ? bet_amount : getStoredValue('bet_amount'));
 }
 // save money between reload
-function setBet() {
+function getBetFromSelect() {
     // get value of select
     var loc_bet = document.getElementById('select_bet').value;
     var found = false;
@@ -278,6 +268,7 @@ function setBet() {
     // set bet amount to selected bet, or total money if all in
     bet_amount = (!found ? bet_amount : (loc_bet != 5 ? bet_info[loc_bet]['value'] : total_money));
 
+    // store bet_amount between reloads
     storeValue('bet_amount', bet_amount);
 }
 // add/substract total money if win or loss
