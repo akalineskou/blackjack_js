@@ -49,14 +49,16 @@ if (getStoredValue('stay') == '1') {
         // hosue cards
         house_card_ids = JSON.parse(getStoredValue('house_card_ids'));
 
-        // calculate new player points
+        // calculate player/house points
         calcPlayerHand();
+        calcHouseHand();
 
-        // calculate if house needs to draw
-        if (points <= 21)
-            houseNewCard();
-        else
-            calcHouseHand();
+        // if player has 21 points, house should draw
+        if (points == 21 && house_points != 21) {
+            // while the house has less points, draw
+            while (house_points < points)
+                houseNewCard(true);
+        }
 
         // remove hit me after drawing a card
         removeValue('hitme');
@@ -74,6 +76,13 @@ if (getStoredValue('stay') == '1') {
             // calculate player/house points
             calcPlayerHand();
             calcHouseHand();
+
+            // player starting hand 21, house should draw cards
+            if (points == 21 && house_points != 21) {
+                // while the house has less points, draw
+                while (house_points < points)
+                    houseNewCard(true);
+            }
         }
         
         // get old values if reload when in a game
@@ -233,7 +242,7 @@ function showStats() {
 
 // show message on game over + win/loss amount
 function gameoverMessage() {
-    return "You " + (draw ? "Draw" : (!win ? "Lost " : "Won ") + bet_amount + "$");
+    return (draw ? "Draw" : "You " + (!win ? "Lost " : "Won ") + bet_amount + "$");
 }
 
 // get card_info values if stored, else default
