@@ -14,13 +14,13 @@
         <br><br><br><br>
         <section class="title_sec">
             <div id="total_money_title">
-                Total money: <div id="total_money" style="display:inline"></div>$
+                Total Money: <div id="total_money" style="display:inline"></div>$
             </div>
             <div id="title">
-                <h1 class="noPad">Blackjack<span class="small">(<a href="" title="Restore everything to default" onclick="eraseCookies(); clearValues(); reloadPage();">Reset</a>)</span></h1>
+                <h1 class="noPad">Blackjack<span class="small">(<a href="" title="Restore everything to default" onclick="eraseCookies(); clearValues(); reloadPage();">X</a>)</span></h1>
             </div>
             <div id="bet">
-                Bet amount: <div id="in_bet" style="display:inline"></div>
+                Bet Amount: <div id="in_bet" style="display:inline"></div>
             </div>
         </section>
 
@@ -31,10 +31,12 @@
             <div id="house"></div>
             <div id="buttons"></div>
         </section>
+
         <div id="stats"></div>
         <noscript>
                 <div id="message" class="noscript">Your browser does not support JavaScript!</div>
         </noscript>
+        
         <script>
             // sets total money in the title div
             showTotalMoney();

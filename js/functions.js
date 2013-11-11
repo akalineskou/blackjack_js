@@ -131,7 +131,6 @@ function betAmountSetSelect() {
 
     for (var i = 1; i <= Object.size(bet_info); i++)
         html_output += '<option value="'+ i +'"' +
-                        
                         (bet_info[i]['value'] > total_money ? ' disabled' : (i == 1 ? ' selected' : '')) +
                         '>'+ bet_info[i]['name'] + (i == 5 ? '' : '$') + '</option>';
     html_output += '</select>';

@@ -19,7 +19,7 @@ h1.noPad {
     margin: 0px;
 }
 .small {
-	font-size:40%;
+	font-size:50%;
 	vertical-align:middle;
 }
 pre {
@@ -46,17 +46,17 @@ section.title_sec {
 }
 div#total_money_title {
 	float: left;
-	width: 40%;
+	width: 30%;
 }
 div#title {
-	width: 24%;
+	width: 40%;
 
 	font-size:150%;
 
 	float: left;
 }
 div#bet {
-	width: 35%;
+	width: 30%;
 	float: left;
 }
 

@@ -134,8 +134,8 @@ function showGame() {
     removeValue('start');
 
     var html_output =
-    '<span class="valign"><h1 class="noPad">Your hand</h1><br>' + card_imgs + '<br>' +
-        '<b>' + points + ' Points</b><br>'+
+    '<span class="valign"><h1 class="noPad">Your Hand</h1><br>' + card_imgs + '<br>' +
+        '<b>' + points + ' Points</b><br>' +
     '</span>';
 
     // set player html output visible
@@ -148,16 +148,16 @@ function showGame() {
     storeValue('card_info', JSON.stringify(card_info));
 
     var button_output = 
-    '<input type="button" value="Hit me" onclick="'+
-        'storeValue(\'hitme\', 1); '+
-        'reloadPage();"'+
+    '<input type="button" value="Hit Me" onclick="' +
+        'storeValue(\'hitme\', 1); ' +
+        'reloadPage();"' +
     '>';
 
     if (points > 10) {
         button_output +=
-        '&nbsp;<input type="button" value="&nbsp;Stay&nbsp;" onclick="'+
-            'storeValue(\'stay\', 1); '+
-            'reloadPage();"'+
+        '&nbsp;<input type="button" value="&nbsp;Stay&nbsp;" onclick="' +
+            'storeValue(\'stay\', 1); ' +
+            'reloadPage();"' +
         '>';
     }
 
@@ -168,7 +168,7 @@ function showGameover() {
     clearValues();
     
     var html_output =
-    '<span class="valign"><h1 class="noPad">Your hand</h1><br>' +
+    '<span class="valign"><h1 class="noPad">Your Hand</h1><br>' +
         card_imgs + '<br>' +
     '<b>' + points + ' Points</b></span>';
     
@@ -284,6 +284,7 @@ function getBetFromSelect() {
     // store bet_amount between reloads
     storeValue('bet_amount', bet_amount);
 }
+
 // add/substract total money if win or loss
 function calculateMoney() {
     total_money = (win ? parseInt(total_money) + parseInt(bet_amount) : parseInt(total_money) - parseInt(bet_amount));

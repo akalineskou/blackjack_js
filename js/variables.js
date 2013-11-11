@@ -29,7 +29,7 @@ var bet_info = {
         'value' : 100
     },
     5 : {
-        'name' : 'All in',
+        'name' : 'All In',
         'value' : 'set total_money!!'
     }
 }
