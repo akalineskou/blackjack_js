@@ -4,6 +4,7 @@ var card_count = 52;
 // money variables
 var total_money = 100;
 var bet_amount = 10;
+
 /* bet info array
  ** name: text to show user
  ** value: value to add to bet(5 adds total money) */

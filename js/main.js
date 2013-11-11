@@ -25,9 +25,12 @@ if (getStoredValue('stay') == '1') {
     calcPlayerHand();
     calcHouseHand();
 
-    // while the house has less points, draw since it is at the end
-    while (house_points < points)
-        houseNewCard(true);
+    // if player has less than 21, he house should draw
+    if (points <= 21) {
+        // while the house has less points, draw since it is at the end
+        while (house_points < points)
+            houseNewCard(true);
+    }
 
     // end game on stay
     gameover = 1;
@@ -162,7 +165,7 @@ function showGameover() {
     
     var html_output =
     '<span class="valign"><h1 class="noPad">Your hand</h1><br>' +
-    card_imgs + '<br>' +
+        card_imgs + '<br>' +
     '<b>' + points + ' Points</b></span>';
     
     // set player html output visible
@@ -189,12 +192,12 @@ function showHouse() {
     // show house_card_ids size -1 cards, the last one is turned around, unless game ends
     for (var i = 0; i < Object.size(house_card_ids); i++) {
         if ((getStoredValue('stay') == '1' || gameover) || i + 1 < Object.size(house_card_ids)) {
-            html_output += "<img src='img/" + card_info[house_card_ids[i]]['card'] + ".bmp'>";
+            html_output += "<img src='img/" + card_info[house_card_ids[i]]['card'] + ".bmp'>&nbsp;";
 
             loc_points += (card_info[house_card_ids[i]]['points'] == 1 ? 11 : card_info[house_card_ids[i]]['points']);
         }
         else
-            html_output += "<img src='img/back.png'>";
+            html_output += "<img src='img/back.png'>&nbsp;";
     }
 
     html_output +=

@@ -24,7 +24,7 @@ function calcPlayerHand() {
         else
             points += card_info[card_id]['points'];
         
-        card_imgs += "<img src='img/" + card_info[card_id]['card'] + ".bmp'> ";
+        card_imgs += "<img src='img/" + card_info[card_id]['card'] + ".bmp'>&nbsp;";
     }
 
     /* count aces
