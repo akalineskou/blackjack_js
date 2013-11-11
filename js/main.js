@@ -29,8 +29,8 @@ if (getStoredValue('stay') == '1') {
     // calculate player/house points
     calcPlayerHand();
     calcHouseHand();
-
-    // if player has less than 21, he house should draw
+    
+    // if player has less than 21, the house should draw
     if (points <= 21) {
         // while the house has less points, draw since it is at the end
         while (house_points < points)
@@ -49,18 +49,20 @@ if (getStoredValue('stay') == '1') {
         // hosue cards
         house_card_ids = JSON.parse(getStoredValue('house_card_ids'));
 
-        // calculate if house needs to draw
-        houseNewCard();
-
         // calculate new player points
         calcPlayerHand();
+
+        // calculate if house needs to draw
+        if (points <= 21)
+            houseNewCard();
+        else
+            calcHouseHand();
 
         // remove hit me after drawing a card
         removeValue('hitme');
     } else {
         // at the start of the game, random 2 cards for each one
-        if (getStoredValue('start') == "1")
-        {
+        if (getStoredValue('start') == "1") {
             // player hand
             for (i = 0; i <= 1; i++)
                 card_ids[i] = randomCardUnused();
@@ -87,19 +89,20 @@ if (getStoredValue('stay') == '1') {
         }
     }
 }
+
 if (getStoredValue('start') == "1" || inMiddleOfGame()) {
     if (points == 21 && house_points != 21) // win if at 21 and house not at 21
         win = gameover = 1;
     else if (points > 21) // end game if over 21
         gameover = 1;
-    else if (house_points == 21) // end game if house at 21
+    else if (points != 21 && house_points == 21) // end game if house at 21
         gameover = 1;
     else if (house_points > 21) // end game and win if house hand over 21
         win = gameover = 1;
-    else if (points <= 21 && house_points != 21 && points == house_points) // draw
-        draw = gameover = 1;
+    else if (gameover && points == house_points) // draw
+        draw = 1;
 }
-// if gameover and didnt win with a 21 at start before the house
+
 // calculate the win
 if (gameover && win != 1)
     win = (points < 21 && points > house_points ? 1 : 0);
@@ -199,6 +202,7 @@ function showHouse() {
 
     // show house_card_ids size -1 cards, the last one is turned around, unless game ends
     for (var i = 0; i < Object.size(house_card_ids); i++) {
+        // show last card on stay/gameover
         if ((getStoredValue('stay') == '1' || gameover) || i + 1 < Object.size(house_card_ids)) {
             html_output += "<img src='img/" + card_info[house_card_ids[i]]['card'] + ".bmp'>&nbsp;";
 
