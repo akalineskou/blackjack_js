@@ -3,12 +3,26 @@ function reloadPage() {
     window.location.reload();
 }
 
-// returns number from 1-52
+// returns number from 1-52 with seed
 function randomCard() {
     // random seed
-    Math.seedrandom("Hlektr0n!k0 Emp0r!0", true);
+    Math.seedrandom(math_seed, true);
 
     return Math.floor((Math.random()*card_count)+1);
+}
+
+// returns card id of random unused card, and mark said card as unused
+function randomCardUnused() {
+    var card = randomCard();
+
+    // if card is used random another
+    while (card_info[card]['used'])
+        card = randomCard();
+
+    // mark it as used
+    makeCardUsed(card);
+
+    return card;
 }
 
 // calculate player points and set cards to show
@@ -51,9 +65,9 @@ function houseNewCard(force_draw) {
             loc_aces++;
     }
 
-    // if house points <= 12 or small card draw another card
+    // if house points <= 12 or small card draw another unused random card
     if (force_draw == true || ((house_points - (loc_aces == 1 ? 10 : 0)) <= 12 && temp_bool))
-        house_card_ids[Object.size(house_card_ids)] = randomCard();
+        house_card_ids[Object.size(house_card_ids)] = randomCardUnused();
 
     // calculate new house points before checking
     calcHouseHand();
@@ -84,6 +98,11 @@ function calcHouseHand() {
         loc_points += (loc_points < 11 && loc_aces - i == 1 ? 11 : 1);
 
     house_points = loc_points;
+}
+
+// mark card as used
+function makeCardUsed(card) {
+    card_info[card]['used'] = true;
 }
 
 // returns true if data from game is stored

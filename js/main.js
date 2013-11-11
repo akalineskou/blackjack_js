@@ -10,6 +10,9 @@ var card_ids = new Object();
 var house_card_ids = new Object();
 var card_imgs = '';
 
+// get used cards info
+getCardInfo();
+
 // get previous games stats
 getStats();
 
@@ -39,7 +42,7 @@ if (getStoredValue('stay') == '1') {
     if (getStoredValue('hitme') == "1") {
         // player cards
         card_ids = JSON.parse(getStoredValue('card_ids'));
-        card_ids[Object.size(card_ids)] = randomCard();
+        card_ids[Object.size(card_ids)] = randomCardUnused();
 
         // hosue cards
         house_card_ids = JSON.parse(getStoredValue('house_card_ids'));
@@ -58,11 +61,11 @@ if (getStoredValue('stay') == '1') {
         {
             // player hand
             for (i = 0; i <= 1; i++)
-                card_ids[i] = randomCard();
+                card_ids[i] = randomCardUnused();
 
             // house hand
             for (i = 0; i <= 1; i++)
-                house_card_ids[i] = randomCard();
+                house_card_ids[i] = randomCardUnused();
 
             // calculate player/house points
             calcPlayerHand();
@@ -142,6 +145,7 @@ function showGame() {
     storeValue('card_ids', JSON.stringify(card_ids));
     storeValue('house_card_ids', JSON.stringify(house_card_ids));
     storeValue('bet_amount', bet_amount);
+    storeValue('card_info', JSON.stringify(card_info));
 
     var button_output = 
     '<input type="button" value="Hit me" onclick="'+
@@ -219,11 +223,17 @@ function showStats() {
     setInnerHTML('stats', html_output);
 }
 
+// show message on game over + win/loss amount
 function gameoverMessage() {
     return (!win ? "You Lost " : "You Won ") + bet_amount + "$";
 }
 
-// set/get/calc stats as cookies
+// get card_info values if stored, else default
+function getCardInfo() {
+    card_info = (getStoredValue('card_info') === null ? card_info : JSON.parse(getStoredValue('card_info')));
+}
+
+// set/get stats as cookies
 function setStats() {
     var stats = new Object();
     
@@ -232,7 +242,6 @@ function setStats() {
     
     createCookie('stats', stats);
 }
-// get total wins/losses
 function getStats() {
     
     var stats = readCookie('stats');
@@ -243,6 +252,7 @@ function getStats() {
         total_losses = stats['total_losses'];
     }
 }
+// add total wins/losses
 function calculateStats() {
     win ? total_wins++ : total_losses++;
 }
