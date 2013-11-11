@@ -1,13 +1,10 @@
-// refresh the page
-function refreshPage() {
-    var path = window.location.pathname;
-    var page = path.substr(path.lastIndexOf("/") + 1);
-    
-    window.location = page;
+// reload the page
+function reloadPage() {
+    window.location.reload();
 }
 
 // returns number from 1-52
-function random_card() {
+function randomCard() {
     // random seed
     Math.seedrandom("Hlektr0n!k0 Emp0r!0", true);
 
@@ -16,32 +13,32 @@ function random_card() {
 
 // calculates if the house should draw cards
 function houseNewCard() {
-    var locHousePoints = calcHouseHand();
-    var tempBool = false;
+    var loc_house_points = calcHouseHand();
+    var temp_bool = false;
 
     // if house hand has a small card(not ace) draw another card
     for (var i = 0; i < Object.size(house_card_ids); i++) {
         if (card_info[house_card_ids[i]]['points'] >= 2 && card_info[house_card_ids[i]]['points'] <= 6) {
-            tempBool = true;
+            temp_bool = true;
 
             break;
         }
     }
 
     // if house points <= 12 or small card draw another card
-    if (locHousePoints <= 12 && tempBool)
-        house_card_ids[Object.size(house_card_ids)] = random_card();
+    if (loc_house_points <= 12 && temp_bool)
+        house_card_ids[Object.size(house_card_ids)] = randomCard();
 
-    locHousePoints = calcHouseHand();
+    loc_house_points = calcHouseHand();
 
     // end game if house gets 21
-    if (locHousePoints == 21)
+    if (loc_house_points == 21)
         gameover = 1;
 }
 // calculate house points
 function calcHouseHand() {
-    var locPoints = 0;
-    var locAces = 0;
+    var loc_points = 0;
+    var loc_aces = 0;
 
     for (var i = 0; i < Object.size(house_card_ids); i++) {
         // current card id
@@ -49,17 +46,17 @@ function calcHouseHand() {
 
         // add the card points
         if (card_info[hand_card_id]['points'] == 1) // ace
-            locAces++;
+            loc_aces++;
         else
-            locPoints += card_info[hand_card_id]['points'];
+            loc_points += card_info[hand_card_id]['points'];
     }
 
-    /* count locAces
-     ** locPoints >= 11 then add 1, else 11 */
-    for (i = 0; i < locAces; i++)
-        locPoints += (locPoints < 11 && locAces - i == 1 ? 11 : 1);
+    /* count loc_aces
+     ** loc_points >= 11 then add 1, else 11 */
+    for (i = 0; i < loc_aces; i++)
+        loc_points += (loc_points < 11 && loc_aces - i == 1 ? 11 : 1);
 
-    return locPoints;
+    return loc_points;
 }
 
 // returns true if data from game is stored
@@ -84,9 +81,9 @@ function setSectionHeight(height) {
 
 // html for select values for the bets
 function betAmountSetSelect() {
-    var html_output = '<select id="select_bet" onchange="set_bet()">';
+    var html_output = '<select id="select_bet" onchange="setBet()">';
 
-    for (i = 1; i <= Object.size(bet_info); i++)
+    for (var i = 1; i <= Object.size(bet_info); i++)
         html_output += '<option value="'+ i +'"' + (i == 1 ? 'selected' : '') + '>'+ bet_info[i]['name'] + (i == 5 ? '' : '$') + '</option>';
     html_output += '</select>';
 
@@ -116,26 +113,27 @@ function clearValues() {
 }
 
 // create/read/delete cookies
-function create_cookie(name, value) {
+function createCookie(name, value) {
     var cookie = [name, '=', JSON.stringify(value), '; path=/;'].join('');
     document.cookie = cookie;
 }
-function read_cookie(name) {
+function readCookie(name) {
     var result = document.cookie.match(new RegExp(name + '=([^;]+)'));
     result && (result = JSON.parse(result[1]));
  
     return result;
 }
-function delete_cookie(name) {
+function deleteCookie(name) {
     document.cookie = name + '=; expires=Thu, 01-Jan-1970 00:00:01 GMT; path=/';
 }
-function erase_cookies() {
+function eraseCookies() {
     var cookies = document.cookie.split(";");
+
     for (var i = 0; i < cookies.length; i++)
-        delete_cookie(cookies[i].split("=")[0]);
+        deleteCookie(cookies[i].split("=")[0]);
 }
 
-// get associative array size(object)
+// get associative array size(of object)
 Object.size = function(obj) {
     var size = 0, key;
     for (key in obj) {
@@ -147,6 +145,6 @@ Object.size = function(obj) {
 // debug function, output to console
 function log(msg) {
     setTimeout(function() {
-        throw new Error("#" + msg +"#");
+        throw new Error(msg);
     }, 0);
 }

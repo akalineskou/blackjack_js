@@ -17,7 +17,7 @@
                 Total money: <div id="total_money" style="display:inline"></div>$
             </div>
             <div id="title">
-                <h1 class="noPad">Blackjack<font class="small">(<a href="" title="Restore everything to default" onclick="erase_cookies(); clearValues(); refreshPage();">Reset</a>)</font></h1>
+                <h1 class="noPad">Blackjack<font class="small">(<a href="" title="Restore everything to default" onclick="eraseCookies(); clearValues(); reloadPage();">Reset</a>)</font></h1>
             </div>
             <div id="bet">
                 Bet amount: <div id="in_bet" style="display:inline"></div>
@@ -43,7 +43,7 @@
                 betAmountSetSelect();
 
                 // default screen
-                show_default();
+                showDefault();
             } else { // in game
                 // shows user bet amount
                 showBetAmount();
@@ -51,23 +51,23 @@
                 // stay with hand
                 if (getStoredValue('stay') == '1') {
                     // house hand
-                    show_house();
+                    showHouse();
 
-                    show_gameover();
+                    showGameover();
                 } else {
                     // house hand
-                    show_house();
+                    showHouse();
 
                     // hit me, show game over or current hand
                     if (gameover)
-                        show_gameover();
+                        showGameover();
                     else
-                        show_game();
+                        showGame();
                 }
             }
 
             // show stats
-            show_stats();
+            showStats();
         </script>
     </body>
 </html>
