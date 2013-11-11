@@ -71,7 +71,7 @@ section.main_sec {
 	background: #001030;
 	border: 2px solid;
 
-	background: url('img/backcen.gif');
+	background: url('img/bg.gif');
 }
 div#message {
 	line-height: 75px;
