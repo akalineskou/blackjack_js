@@ -32,7 +32,6 @@ pre {
 
 section.full {
 	width: 820px;
-
 	margin: auto;
 }
 
@@ -43,8 +42,6 @@ section.title_sec {
 	height: 60px;
 
 	text-align: center;
-	margin-left: auto;
-	margin-right: auto;
 
 	background: #001030;
 	border-radius: 15px;
@@ -55,12 +52,11 @@ section.title_sec {
 	top: 2px;
 }
 div#total_money_title {
-	float: left;
 	width: 30%;
+	float: left;
 }
 div#title {
 	width: 40%;
-
 	float: left;
 }
 div#bet {
@@ -156,11 +152,8 @@ div#stats {
 
 	width: 815px;
 
-	line-height: 100px;
-	height: 135px;
-
-	margin-left: auto;
-	margin-right: auto;
+	line-height: 130px;
+	height: 145px;
 	
 	background: #001030;
 	border: 2px solid;
@@ -175,7 +168,6 @@ span.valign {
 	vertical-align: middle;
 	line-height: 1em;
 }
-
 
 /* http://jeromejaglale.com/doc/css/pretty_button */
 input[type="button"] {

@@ -8,16 +8,17 @@ function randomCard() {
     // random seed
     Math.seedrandom(math_seed, true);
 
-    return Math.floor((Math.random()*card_count)+1);
+    return Math.floor((Math.random() * card_count) + 1);
 }
 
 // returns card id of random unused card, and mark said card as unused
 function randomCardUnused() {
-    var card = randomCard();
+    var card;
 
-    // if card is used random another
-    while (card_info[card]['used'])
+    // if card is used, random another
+    do {
         card = randomCard();
+    } while (card_info[card]['used']);
 
     // mark it as used
     makeCardUsed(card);
@@ -27,47 +28,40 @@ function randomCardUnused() {
 
 // calculate player points and set cards to show
 function calcPlayerHand() {
-    // for each card calculate it
-    for (var i = 0; i < Object.size(card_ids); i++) {
+    var loc_points = 0;
+    var aces = 0;
+    var player_card_count = Object.size(player_card_ids);
+
+    // for each player card calculate points and images
+    for (var i = 0; i < player_card_count; i++) {
         // current card id
-        var card_id = card_ids[i];
+        var card_id = player_card_ids[i];
 
         // add the points
         if (card_info[card_id]['points'] == 1) // ace
             aces++;
         else
-            points += card_info[card_id]['points'];
+            loc_points += card_info[card_id]['points'];
         
-        card_imgs += "<img src='img/" + card_info[card_id]['card'] + ".bmp'>&nbsp;";
+        // if card count 6, at the 3rd card put new line else space
+        card_imgs += "<img src='img/" + card_info[card_id]['card'] + ".bmp'>" +
+                    (player_card_count % 6 == 0 && ((i+1) % 3 == 0) ? "<br>" : "&nbsp;");
     }
 
+    if (player_card_count % 6 == 0)
+        change_div_height = true;
+
     /* count aces
-     ** points >= 11 then add 1, else 11 */
+     ** loc_points >= 11 then add 1, else 11 */
     for (i = 0; i < aces; i++)
-        points += (points < 11 && aces - i == 1 ? 11 : 1);
+        loc_points += (loc_points < 11 && aces - i == 1 ? 11 : 1);
+
+    player_points = loc_points;
 }
 
 // calculates if the house should draw cards
-function houseNewCard(force_draw) {
-    // default false
-    force_draw = (force_draw === "undefined" ? false : force_draw)
-
-    var temp_bool = false;
-    var loc_aces = 0;
-
-    // if house hand has a small card(not ace) draw another card
-    for (var i = 0; i < Object.size(house_card_ids); i++) {
-        if (card_info[house_card_ids[i]]['points'] >= 2 && card_info[house_card_ids[i]]['points'] <= 6) {
-            temp_bool = true;
-
-            break;
-        } else if (card_info[house_card_ids[i]]['points'] == 1)
-            loc_aces++;
-    }
-
-    // if house points <= 12 or small card draw another unused random card
-    if (force_draw == true || ((house_points - (loc_aces == 1 ? 10 : 0)) <= 12 && temp_bool))
-        house_card_ids[Object.size(house_card_ids)] = randomCardUnused();
+function houseNewCard() {
+    house_card_ids[Object.size(house_card_ids)] = randomCardUnused();
 
     // calculate new house points before checking
     calcHouseHand();
@@ -80,8 +74,9 @@ function houseNewCard(force_draw) {
 function calcHouseHand() {
     var loc_points = 0;
     var loc_aces = 0;
+    var house_card_count = Object.size(house_card_ids);
 
-    for (var i = 0; i < Object.size(house_card_ids); i++) {
+    for (var i = 0; i < house_card_count; i++) {
         // current card id
         var hand_card_id = house_card_ids[i];
 
@@ -97,6 +92,9 @@ function calcHouseHand() {
     for (i = 0; i < loc_aces; i++)
         loc_points += (loc_points < 11 && loc_aces - i == 1 ? 11 : 1);
 
+    if (house_card_count % 6 == 0)
+        change_div_height = true;
+
     house_points = loc_points;
 }
 
@@ -107,7 +105,7 @@ function makeCardUsed(card) {
 
 // returns true if data from game is stored
 function inMiddleOfGame() {
-    return (getStoredValue('card_ids') !== null &&
+    return (getStoredValue('player_card_ids') !== null &&
             getStoredValue('house_card_ids') !== null &&
             getStoredValue('bet_amount') !== null ? true : false);
 }
@@ -119,9 +117,55 @@ function setInnerHTML(name, value){
     div.innerHTML = value;
 }
 
+// shuffle card info for more randomness
+function shuffleCards() {
+    var temp_card_info = new Object();
+    var used_ids = new Array();
+    var rand_card;
+
+    // init used_ids as false
+    for (var i = 1; i <= card_count; i++)
+        used_ids[i] = false;
+
+    for (var i = 1; i <= card_count; i++) {
+        var break_do = false;
+        var loc_card_count = 0;
+
+        // if used_ids[rand_card] is true, then temp_card_info[rand_card] is equal to the old card_info[i]
+        // since it is random, some numbers will repeat, so checking for true, means that number was set
+        do {
+            rand_card = randomCard();
+
+            // if random card was not set, break the loop
+            if (used_ids[rand_card] == false) {
+                used_ids[rand_card] = true;
+
+                break_do = true;
+            }
+
+            // all cards have been checked
+            if (loc_card_count > card_count)
+                break;
+
+            loc_card_count++;
+        } while (!break_do);
+        
+        // place card_info[i] into a unique temp_card_info with a random number
+        temp_card_info[rand_card] = card_info[i];
+    }
+
+    // save the new card info
+    card_info = temp_card_info;
+}
+
 // for layout dynamic fixes
 function setSectionHeight(height) {
     var div = document.getElementById('main');
+    div.style.height = height + "px";
+}
+function setDivProperties(name, height) {
+    var div = document.getElementById(name);
+    div.style.lineHeight = height + "px";
     div.style.height = height + "px";
 }
 
@@ -150,11 +194,11 @@ function checkMoneyStart() {
     if (total_money)
         getBetFromSelect();
 
-    if (total_money == 0) {
+    if (total_money == 0)
         alert('You can\'t play because you have no more money to bet!');
-    } else if (bet_amount > total_money) {
+    else if (bet_amount > total_money)
         alert('The bet amount is more than your total money!');
-    } else {
+    else {
         // start game
         storeValue('start', 1);
 

@@ -12,7 +12,7 @@
     </head>
     <body>
         <br><br><br><br>
-        
+
         <section class="full">
             <section class="title_sec">
                 <div id="total_money_title">
@@ -52,28 +52,18 @@
                 // displays the bet amount options, disabled by default
                 betAmountSetSelect();
 
+                // shuffle cards before starting a game
+                setShuffledCards();
+
                 // default screen
                 showDefault();
             } else { // in game
                 // shows user bet amount
                 showBetAmount();
 
-                // stay with hand
-                if (getStoredValue('stay') == '1') {
-                    // house hand
-                    showHouse();
-
-                    showGameover();
-                } else {
-                    // house hand
-                    showHouse();
-
-                    // hit me, show game over or current hand
-                    if (gameover)
-                        showGameover();
-                    else
-                        showGame();
-                }
+                // show player/house cards
+                showHouse();
+                showPlayer();
             }
 
             // show stats

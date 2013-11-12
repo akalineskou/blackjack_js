@@ -2,28 +2,24 @@
 var total_wins = 0;
 var total_losses = 0;
 var total_games = 0;
-var points = 0;
+var player_points = 0;
 var house_points = 0;
-var aces = 0;
-var win = 0;
-var draw = 0;
-var gameover = 0;
-var card_ids = new Object();
+
+var win = false;
+var draw = false;
+var gameover = false;
+
+var player_card_ids = new Object();
 var house_card_ids = new Object();
 var card_imgs = '';
+var change_div_height = false;
 
-// get used cards info
-getCardInfo();
-
-// get previous games stats
-getStats();
-
-// get money/bet
-getMoneyBet();
+// gets all the stored data
+getData();
 
 // if stay, get previous card ids
 if (getStoredValue('stay') == '1') {
-    card_ids = JSON.parse(getStoredValue('card_ids'));
+    player_card_ids = JSON.parse(getStoredValue('player_card_ids'));
     house_card_ids = JSON.parse(getStoredValue('house_card_ids'));
 
     // calculate player/house points
@@ -31,20 +27,20 @@ if (getStoredValue('stay') == '1') {
     calcHouseHand();
     
     // if player has less than 21, the house should draw
-    if (points <= 21) {
+    if (player_points <= 21) {
         // while the house has less points, draw since it is at the end
-        while (house_points < points)
-            houseNewCard(true);
+        while (house_points < player_points)
+            houseNewCard();
     }
 
     // end game on stay
-    gameover = 1;
+    gameover = true;
 } else {
     // get old cards on hit me + add a new one
     if (getStoredValue('hitme') == "1") {
         // player cards
-        card_ids = JSON.parse(getStoredValue('card_ids'));
-        card_ids[Object.size(card_ids)] = randomCardUnused();
+        player_card_ids = JSON.parse(getStoredValue('player_card_ids'));
+        player_card_ids[Object.size(player_card_ids)] = randomCardUnused();
 
         // hosue cards
         house_card_ids = JSON.parse(getStoredValue('house_card_ids'));
@@ -54,10 +50,10 @@ if (getStoredValue('stay') == '1') {
         calcHouseHand();
 
         // if player has 21 points, house should draw
-        if (points == 21 && house_points != 21) {
+        if (player_points == 21 && house_points != 21) {
             // while the house has less points, draw
-            while (house_points < points)
-                houseNewCard(true);
+            while (house_points < player_points)
+                houseNewCard();
         }
 
         // remove hit me after drawing a card
@@ -67,7 +63,7 @@ if (getStoredValue('stay') == '1') {
         if (getStoredValue('start') == "1") {
             // player hand
             for (i = 0; i <= 1; i++)
-                card_ids[i] = randomCardUnused();
+                player_card_ids[i] = randomCardUnused();
 
             // house hand
             for (i = 0; i <= 1; i++)
@@ -78,19 +74,17 @@ if (getStoredValue('stay') == '1') {
             calcHouseHand();
 
             // player starting hand 21, house should draw cards
-            if (points == 21 && house_points != 21) {
+            if (player_points == 21 && house_points != 21) {
                 // while the house has less points, draw
-                while (house_points < points)
-                    houseNewCard(true);
+                while (house_points < player_points)
+                    houseNewCard();
             }
         }
         
         // get old values if reload when in a game
         if (inMiddleOfGame()) {
-            card_ids = JSON.parse(getStoredValue('card_ids'));
-            house_card_ids = JSON.parse(getStoredValue('house_card_ids'));
-
-            getMoneyBet();  
+            player_card_ids = JSON.parse(getStoredValue('player_card_ids'));
+            house_card_ids = JSON.parse(getStoredValue('house_card_ids'));  
 
             // calculate player/house points
             calcPlayerHand();
@@ -100,37 +94,27 @@ if (getStoredValue('stay') == '1') {
 }
 
 if (getStoredValue('start') == "1" || inMiddleOfGame()) {
-    if (points == 21 && house_points != 21) // win if at 21 and house not at 21
-        win = gameover = 1;
-    else if (points > 21) // end game if over 21
-        gameover = 1;
-    else if (points != 21 && house_points == 21) // end game if house at 21
-        gameover = 1;
+    if (player_points == 21 && house_points != 21) // win if at 21 and house not at 21
+        win = gameover = true;
+    else if (player_points > 21) // end game if over 21
+        gameover = true;
+    else if (player_points != 21 && house_points == 21) // end game if house at 21
+        gameover = true;
     else if (house_points > 21) // end game and win if house hand over 21
-        win = gameover = 1;
-    else if (gameover && points == house_points) // draw
-        draw = 1;
+        win = gameover = true;
+    else if (gameover && player_points == house_points) // draw
+        draw = true;
 }
 
 // calculate the win
-if (gameover && win != 1)
-    win = (points < 21 && points > house_points ? 1 : 0);
+if (gameover && !win)
+    win = (player_points < 21 && player_points > house_points ? true : false);
 
 // do at the end of the game
-if (gameover) {
-    // add the current game to the stats
-    calculateStats();
-    
-    // set the stats
-    setStats();
+if (gameover)
+    setData();
 
-    // calculate money before saving it
-    calculateMoney();
-
-    // set total money
-    setMoney();
-}
-
+// default screen panel
 function showDefault() {
     var html_output =
     '<span class="valign">' +
@@ -145,48 +129,121 @@ function showDefault() {
 
     setInnerHTML('buttons', button_output);
 }
-function showGame() {
-    // remove start, on reload the old cards remain
-    removeValue('start');
+
+// player panel
+function showPlayer() {
+    if (gameover)
+        clearValues(); // clear values on game over
+    
+        removeValue('start'); // remove start, on reload the old cards remain
 
     var html_output =
-    '<span class="valign"><h1 class="noPad">Your Hand</h1><br>' + card_imgs + '<br>' +
-        '<b>' + points + ' Points</b><br>' +
-    '</span>';
+    '<span class="valign"><h1 class="noPad">Your Hand</h1><br>' +
+        card_imgs + '<br>' +
+    '<b>' + player_points + ' Points</b></span>';
 
     // set player html output visible
     setInnerHTML('player', html_output);
 
-    // store data
-    storeValue('card_ids', JSON.stringify(card_ids));
-    storeValue('house_card_ids', JSON.stringify(house_card_ids));
-    storeValue('bet_amount', bet_amount);
-    storeValue('card_info', JSON.stringify(card_info));
-
-    var button_output = 
-    '<input type="button" value="Hit Me" onclick="' +
-        'storeValue(\'hitme\', 1); ' +
-        'reloadPage();"' +
-    '>';
-
-    if (points > 10) {
-        button_output +=
-        '&nbsp;<input type="button" value="&nbsp;Stay&nbsp;" onclick="' +
-            'storeValue(\'stay\', 1); ' +
-            'reloadPage();"' +
-        '>';
+    if (!gameover) {
+        // store data between reloads
+        storeValue('player_card_ids', JSON.stringify(player_card_ids));
+        storeValue('house_card_ids', JSON.stringify(house_card_ids));
+        storeValue('bet_amount', bet_amount);
+        storeValue('card_info', JSON.stringify(card_info));
     }
 
+    var button_output;
+
+    if (!gameover) {
+        button_output = 
+        '<input type="button" value="Hit Me" onclick="' +
+            'storeValue(\'hitme\', 1); ' +
+            'reloadPage();"' +
+        '>';
+
+        if (player_points > 10) {
+            button_output +=
+            '&nbsp;<input type="button" value="&nbsp;Stay&nbsp;" onclick="' +
+                'storeValue(\'stay\', 1); ' +
+                'reloadPage();"' +
+            '>&nbsp;';
+        }
+    } else
+        button_output = '<input type="button" value="Main Menu" onclick="reloadPage();">';
+
     setInnerHTML('buttons', button_output);
+
+    if (gameover) {
+        // set title visible
+        var div = document.getElementById('message');
+        div.style.background = (draw ? "#FFD700" : (win ? "green" : "#CD0000"));
+        div.style.color = "white";
+        div.style.display = 'block';
+        div.innerHTML = '<h1 class="noPad">' + gameoverMessage() + '</h1>';
+
+        // set height of section
+        setSectionHeight(317);
+
+        // set height of player div if cards > 6
+        if (change_div_height) {
+            setDivProperties('player', 300);
+
+            setSectionHeight(417);
+        }
+    } else {
+        // set height of player div if cards > 6
+        if (change_div_height) {
+            setDivProperties('player', 300);
+
+            setSectionHeight(340);
+        }
+    }
 }
+
+// shows house cards, and hides the last card
+function showHouse() {
+    // if player stays or game is over and has <= 21 points, show the last cards
+    var show_last_card = (getStoredValue('stay') == '1' || gameover) && player_points <= 21;
+
+    // last card's points
+    var hidden_card_points = card_info[house_card_ids[Object.size(house_card_ids)-1]]['points'];
+    
+    var html_output = '<span class="valign"><h1 class="noPad">Dealer\'s Hand</h1><br>';
+
+    // show house_card_ids size -1 cards, the last one is turned around, unless game ends
+    for (var i = 0; i < Object.size(house_card_ids); i++) {
+        // show last card on stay/gameover
+        html_output += "<img src='img/" +
+                        (show_last_card || i + 1 < Object.size(house_card_ids) ?
+                            card_info[house_card_ids[i]]['card'] + '.bmp' :
+                            'back.png') +
+                        "'>" +
+                        // if house card count 6, at the 3rd card put new line else space
+                        (Object.size(house_card_ids) % 6 == 0 && ((i+1) % 3 == 0) ? "<br>" : "&nbsp;");
+    }
+
+    html_output +=
+    '<br><b>' + (show_last_card ? house_points : house_points - hidden_card_points) +
+    ' Points</b></span>';
+
+    // set house html output visible
+    setInnerHTML('house', html_output);
+
+    // set height of house div if cards > 6
+    if (change_div_height)
+        setDivProperties('house', 300);
+}
+
+// end of game
 function showGameover() {
     // clear values on game over
     clearValues();
-    
+
     var html_output =
     '<span class="valign"><h1 class="noPad">Your Hand</h1><br>' +
         card_imgs + '<br>' +
-    '<b>' + points + ' Points</b></span>';
+    '<b>' + player_points + ' Points</b></span>';
     
     // set player html output visible
     setInnerHTML('player', html_output);
@@ -202,39 +259,31 @@ function showGameover() {
     div.innerHTML = '<h1 class="noPad">' + gameoverMessage() + '</h1>';
 
     // set height of section
-    setSectionHeight(315);
-}
-function showHouse() {
-    var html_output = '<span class="valign"><h1 class="noPad">Dealer\'s Hand</h1><br>';
+    setSectionHeight(317);
 
-    var loc_points = 0;
+    // set height of player div if cards > 6
+    if (change_div_height) {
+        setDivProperties('player', 300);
 
-    // show house_card_ids size -1 cards, the last one is turned around, unless game ends
-    for (var i = 0; i < Object.size(house_card_ids); i++) {
-        // show last card on stay/gameover
-        if ((getStoredValue('stay') == '1' || gameover) || i + 1 < Object.size(house_card_ids)) {
-            html_output += "<img src='img/" + card_info[house_card_ids[i]]['card'] + ".bmp'>&nbsp;";
-
-            loc_points += (card_info[house_card_ids[i]]['points'] == 1 ? 11 : card_info[house_card_ids[i]]['points']);
-        }
-        else
-            html_output += "<img src='img/back.png'>&nbsp;";
+        setSectionHeight(417);
     }
-
-    html_output +=
-    '<br><b>' + ((getStoredValue('stay') == '1' || gameover) ? house_points : loc_points) +
-    ' Points</b></span>';
-
-    // set house html output visible
-    setInnerHTML('house', html_output);
 }
 
 function showStats() {
-    var html_output = '<span class="valign"><h1 class="bigger">Statistics</h1><pre>' +
-    'Wins                   <b>' + total_wins + '</b><br>' +
-    'Losses                 <b>' + total_losses + '</b><br>' +
-    'Games Played           <b>' + total_games + '</b><br>' +
-    '</pre></span>';
+    var percent = (total_wins / (total_wins + total_losses)) * 100;
+
+    var html_output =
+    '<span class="valign" style="width: 100%;"><h1>Statistics</h1>' +
+    '<table style="margin: 0 auto;" width=35%>'+
+        '<tr><td align="left">Wins</td><td>' + total_wins + '</td></tr>' +
+        '<tr><td align="left">Losses</td><td>' + total_losses + '</td></tr>' +
+        '<tr><td align="left">Games Played</td><td>' + total_games + '</td></tr>' +
+        '<tr><td align="left">Win Percentage</td><td>' +
+            (total_losses == 0 ? (total_wins == 0 ? "0" : "100") :
+                                 (total_wins == 0 ? "0" : parseFloat(percent.toPrecision(4)))) + '%' +
+        '</td></tr>' +        
+    '</table>' +
+    '</span>';
 
     // set stats html output visible
     setInnerHTML('stats', html_output);
@@ -308,4 +357,47 @@ function getBetFromSelect() {
 // add/substract total money if win or loss
 function calculateMoney() {
     total_money = (draw ? total_money : (win ? parseInt(total_money) + parseInt(bet_amount) : parseInt(total_money) - parseInt(bet_amount)));
+}
+
+// store new shuffled card_info
+function setShuffledCards() {
+    //shuffleCards();
+
+    storeValue('shuffled_cards', JSON.stringify(card_info));
+}
+// get shuffled_cards at start, then remove it since it is stored in card_info again
+function getShuffledCards() {
+    if (getStoredValue('shuffled_cards') !== null) {
+        card_info = JSON.parse(getStoredValue('shuffled_cards'));
+
+        removeValue('shuffled_cards');
+    }
+}
+
+// calls all functions to set/get data
+function setData() {
+    // add the current game to the stats
+    calculateStats();
+    
+    // set the stats
+    setStats();
+
+    // calculate money before saving it
+    calculateMoney();
+
+    // set total money
+    setMoney();
+}
+function getData() {
+    // get used cards info
+    getCardInfo();
+
+    // get previous games stats
+    getStats();
+
+    // get money/bet
+    getMoneyBet();
+
+    // get shuffled cards
+    getShuffledCards();
 }
