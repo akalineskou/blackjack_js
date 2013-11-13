@@ -14,6 +14,9 @@ var house_card_ids = new Object();
 var card_imgs = '';
 var change_div_height = false;
 
+// test if cookies are enabled
+testCookies();
+
 // gets all the stored data
 getData();
 
@@ -93,18 +96,16 @@ if (getStoredValue('stay') == '1') {
     }
 }
 
-if (getStoredValue('start') == "1" || inMiddleOfGame()) {
-    if (player_points == 21 && house_points != 21) // win if at 21 and house not at 21
-        win = gameover = true;
-    else if (player_points > 21) // end game if over 21
-        gameover = true;
-    else if (player_points != 21 && house_points == 21) // end game if house at 21
-        gameover = true;
-    else if (house_points > 21) // end game and win if house hand over 21
-        win = gameover = true;
-    else if (gameover && player_points == house_points) // draw
-        draw = true;
-}
+if (player_points == 21 && house_points != 21) // win if at 21 and house not at 21
+    win = gameover = true;
+else if (player_points > 21) // end game if over 21
+    gameover = true;
+else if (player_points != 21 && house_points == 21) // end game if house at 21
+    gameover = true;
+else if (house_points > 21) // end game and win if house hand over 21
+    win = gameover = true;
+else if (gameover && player_points == house_points) // draw
+    draw = true;
 
 // calculate the win
 if (gameover && !win)
@@ -135,7 +136,7 @@ function showPlayer() {
     if (gameover)
         clearValues(); // clear values on game over
     
-        removeValue('start'); // remove start, on reload the old cards remain
+    removeValue('start'); // remove start, on reload the old cards remain
 
     var html_output =
     '<span class="valign"><h1 class="noPad">Your Hand</h1><br>' +
@@ -270,7 +271,7 @@ function showGameover() {
 }
 
 function showStats() {
-    var percent = (total_wins / (total_wins + total_losses)) * 100;
+    var percent = (total_wins / total_games) * 100;
 
     var html_output =
     '<span class="valign" style="width: 100%;"><h1>Statistics</h1>' +

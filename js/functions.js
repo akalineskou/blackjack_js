@@ -208,10 +208,10 @@ function checkMoneyStart() {
 
 // store/get/remove/clear local values
 function storeValue(key, value) {
-    localStorage.setItem(key, value);
+    cookiesEnabled ? localStorage.setItem(key, value) : null;
 }
 function getStoredValue(key) {
-    return localStorage.getItem(key);
+    return (cookiesEnabled ? localStorage.getItem(key) : null);
 }
 function removeValue(key) {
     localStorage.removeItem(key);
@@ -239,6 +239,20 @@ function eraseCookies() {
 
     for (var i = 0; i < cookies.length; i++)
         deleteCookie(cookies[i].split("=")[0]);
+}
+
+// testo if cookies are enabled
+function testCookies() {
+    cookiesEnabled = (navigator.cookieEnabled) ? true : false;
+
+    if (!cookiesEnabled && typeof navigator.cookieEnabled == "undefined") { 
+        document.cookie="testcookie";
+        cookiesEnabled = (document.cookie.indexOf("testcookie") != -1) ? true : false;
+    }
+}
+function areCookiesEnabled() {
+    if (!cookiesEnabled)
+        alert('You must have cookies enabled to play!');
 }
 
 // get associative array size(of object)
