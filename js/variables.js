@@ -5,7 +5,8 @@ var math_seed = "Hlektr0n!k0 Emp0r!0";
 var card_count = 52;
 
 // money variables
-var total_money = 100;
+var default_money = 100; // used to add the default amount if no money
+var total_money = default_money;
 var bet_amount = 10;
 
 var cookiesEnabled;
@@ -27,8 +28,8 @@ var bet_info = {
         'value' : 50
     },
     4 : {
-        'name' : '100',
-        'value' : 100
+        'name' : '150',
+        'value' : 150
     },
     5 : {
         'name' : 'All In',

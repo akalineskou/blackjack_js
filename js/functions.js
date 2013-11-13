@@ -194,9 +194,22 @@ function checkMoneyStart() {
     if (total_money)
         getBetFromSelect();
 
-    if (total_money == 0)
-        alert('You can\'t play because you have no more money to bet!');
-    else if (bet_amount > total_money)
+    if (total_money <= 0) {
+        var add_money = confirm('You can\'t play because you have no more money to bet!\n' +
+                                'Click "OK" to add ' + default_money + '$');
+
+        // if the player clicked ok, set total_money, store it and start game
+        if (add_money) {
+            total_money = default_money;
+
+            setMoney();
+
+            // start game
+            storeValue('start', 1);
+
+            reloadPage();
+        }
+    } else if (bet_amount > total_money)
         alert('The bet amount is more than your total money!');
     else {
         // start game
