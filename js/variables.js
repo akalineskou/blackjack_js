@@ -299,6 +299,7 @@ var card_info = {
     },
     52 : {
         'card' : 'ah',
-        'points' : 1
+        'points' : 1,
+        'used' : false
     }
 }
